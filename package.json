@@ -1,0 +1,84 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "description": "Production-ready backend using Bun",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Harshit Ostwal",
+    "email": "harshitostwal1234@gmail.com",
+    "url": "https://harshitostwal.com"
+  },
+  "contributors": [
+    {
+      "name": "Harshit Ostwal",
+      "email": "harshitostwal1234@gmail.com",
+      "url": "https://harshitostwal.com"
+    }
+  ],
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "scripts": {
+    "dev:nodemon": "cross-env NODE_ENV=development nodemon src/index.js",
+    "dev": "cross-env NODE_ENV=development bun --hot src/index.js",
+    "start": "cross-env NODE_ENV=production bun src/index.js",
+    "start:prod": "cross-env NODE_ENV=production prisma migrate deploy && cross-env NODE_ENV=production bun src/index.js",
+    "biome": "bun biome:clean && bun biome:format && bun biome:check && bun biome:lint",
+    "biome:format": "bunx biome format --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
+    "biome:lint": "bunx biome lint --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
+    "biome:check": "bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
+    "biome:clean": "bunx biome clean",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:migrate:reset": "prisma migrate reset",
+    "prisma:migrate:status": "prisma migrate status",
+    "prisma:studio": "prisma studio",
+    "prisma:db:push": "prisma db push",
+    "prisma:db:pull": "prisma db pull",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*": [
+      "bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true",
+      "bunx biome format --write --no-errors-on-unmatched --files-ignore-unknown=true",
+      "bunx biome lint --write --no-errors-on-unmatched --files-ignore-unknown=true"
+    ]
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.11",
+    "nodemon": "^3.1.14",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.20.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^14.0.0",
+    "winston": "^3.19.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
+    "cross-env": "^10.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
+    "prisma": "^7.8.0"
+  }
+}

@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/infrastructure/database/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id String @id @db.Uuid
+
+  email    String @unique
+  username String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile  Profile?
+  accounts Account[]
+  sessions Session[]
+  links    Links[]
+
+  @@index([email])
+  @@index([username])
+}
+
+model Profile {
+  userId String @id @db.Uuid
+
+  avatar         String?
+  avatarPublicId String?
+
+  firstName String?
+  lastName  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([firstName])
+  @@index([lastName])
+}
+
+model Account {
+  id String @id @db.Uuid
+
+  provider   AuthProvider
+  providerId String
+
+  password String?
+
+  lastLoginAt DateTime?
+
+  // Relations
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerId])
+  @@unique([provider, userId])
+  @@index([userId])
+}
+
+model Session {
+  id String @id @db.Uuid
+
+  refreshToken          String   @unique
+  refreshTokenExpiresAt DateTime
+
+  tokenVersion Int @default(0)
+
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Links {
+  id String @id @db.Uuid
+
+  title       String
+  description String?
+
+  thumbnail         String?
+  thumbnailPublicId String?
+
+  logo         String?
+  logoPublicId String?
+
+  url   String
+  color String?
+
+  isActive Boolean @default(true)
+
+  position   Int    @default(0)
+  clickCount BigInt @default(0)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([title])
+  @@index([position])
+  @@index([userId])
+}
+
+enum AuthProvider {
+  CREDENTIALS
+  GOOGLE
+  GITHUB
+}

@@ -1,0 +1,82 @@
+# Dependencies
+node_modules
+
+# Output directories
+dist
+build
+out
+coverage
+*.tgz
+.next
+.nuxt
+.output
+.vercel
+.netlify
+
+# Logs
+logs
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.ci
+
+# Generated files
+
+# Ignore all generated Prisma files and folders
+prisma/generated/
+prisma/migrations/
+src/infrastructure/database/generated
+
+# Ignore the entire prisma folder if needed
+prisma/
+
+# Node modules and build outputs
+node_modules/
+dist/
+build/
+out/
+coverage/
+*.tgz
+.next/
+.nuxt/
+.output/
+.vercel/
+.netlify/
+
+# Logs
+logs/
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.ci
+
+# System files
+.DS_Store
+
+# Cache files
+.cache/
+.eslintcache
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+
+# System files
+.DS_Store
+
+# Cache files
+.cache
+.eslintcache
+*.tsbuildinfo
+
+# IDE
+.idea

@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Output directories
+dist/
+build/
+out/
+coverage/
+*.tgz
+.next/
+.nuxt/
+.output/
+.vercel/
+.netlify/
+
+# Logs
+logs/
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.ci
+
+# Generated Prisma Client (auto-generated, do NOT push)
+prisma/generated/
+src/infrastructure/database/generated/
+
+# System files
+.DS_Store
+
+# Cache files
+.cache/
+.eslintcache
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/

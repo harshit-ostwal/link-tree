@@ -1,0 +1,103 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+  push:
+    branches:
+      - '**'
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: development
+      PORT: "8080"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Enable Corepack & Install
+        run: |
+          corepack enable
+          bun install --frozen-lockfile
+
+      - name: Check Formatting
+        run: bunx biome check --write
+
+      - name: Lint Code
+        run: bunx biome lint --write
+
+      - name: Formatting Code
+        run: bunx biome format --write
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint-and-build
+    env:
+      NODE_ENV: development
+      PORT: "8080"
+      DATABASE_URL: "postgresql://postgres:password@localhost:5432/mydb?schema=public"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Prisma Generate
+        run: bunx prisma generate
+
+      - name: Start Server in Background
+        run: |
+          # start the server in background and redirect logs to server.log
+          nohup bun start > server.log 2>&1 &
+
+          # Print a quick message and show the last few lines to help debugging
+          echo "Server started in background (check server.log)."
+          sleep 1
+          tail -n 20 server.log || true
+
+      - name: Wait for service to become healthy
+        run: |
+          set -euo pipefail
+          URL="http://localhost:${PORT:-8080}/api/v1/health"
+          ATTEMPTS=30
+          SLEEP_SECS=2
+
+          echo "Waiting for service to become healthy at: $URL"
+          i=0
+          until [ $i -ge $ATTEMPTS ]; do
+            if curl -fsS "$URL" >/dev/null 2>&1; then
+              echo "Service is healthy."
+              exit 0
+            fi
+            i=$((i+1))
+            echo "Waiting... ($i/$ATTEMPTS)"
+            sleep "$SLEEP_SECS"
+          done
+
+          echo "Service did not become healthy after $ATTEMPTS attempts."
+          echo "====== Last 200 lines of server.log ======"
+          tail -n 200 server.log || true
+          echo "=========================================="
+          exit 1
+
+      - name: Call Health Check API (final verify)
+        run: |
+          echo "Final health-check..."
+          curl -f http://localhost:${PORT}/api/v1/health
