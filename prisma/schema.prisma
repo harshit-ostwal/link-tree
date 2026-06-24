@@ -7,32 +7,78 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AuthProvider {
+  CREDENTIALS
+  GOOGLE
+  GITHUB
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  DELETED
+}
+
+enum VerificationType {
+  LOGIN_OTP
+  EMAIL_VERIFY_OTP
+  EMAIL_VERIFY_LINK
+  MAGIC_LOGIN
+  PASSWORD_RESET_OTP
+  PASSWORD_RESET_LINK
+}
+
+enum DeviceType {
+  MOBILE
+  TABLET
+  DESKTOP
+  BOT
+}
+
 model User {
   id String @id @db.Uuid
 
-  email    String @unique
   username String @unique
+
+  email           String    @unique
+  emailVerifiedAt DateTime?
+
+  role   UserRole   @default(USER)
+  status UserStatus @default(ACTIVE)
+
+  deletedAt DateTime?
+
+  profile       Profile?
+  accounts      Account[]
+  sessions      Session[]
+  links         Link[]
+  verifications Verification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profile  Profile?
-  accounts Account[]
-  sessions Session[]
-  links    Links[]
-
   @@index([email])
   @@index([username])
+  @@index([status])
 }
 
 model Profile {
   userId String @id @db.Uuid
 
-  avatar         String?
-  avatarPublicId String?
-
   firstName String?
   lastName  String?
+  bio       String?
+
+  avatar         String?
+  avatarPublicId String?
+  banner         String?
+  bannerPublicId String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -49,11 +95,9 @@ model Account {
   provider   AuthProvider
   providerId String
 
-  password String?
-
+  password    String?
   lastLoginAt DateTime?
 
-  // Relations
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -68,57 +112,102 @@ model Account {
 model Session {
   id String @id @db.Uuid
 
-  refreshToken          String   @unique
-  refreshTokenExpiresAt DateTime
+  refreshToken         String   @unique
+  refreshTokenExpiryAt DateTime
 
   tokenVersion Int @default(0)
 
   ipAddress String?
   userAgent String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  revokedAt  DateTime?
+  replacedBy String?   @db.Uuid
 
-  // Relations
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
+  @@index([refreshTokenExpiryAt])
 }
 
-model Links {
+model Verification {
+  id String @id @db.Uuid
+
+  identifier String
+  token      String           @unique
+  type       VerificationType
+
+  attempts Int @default(0)
+
+  expiresAt  DateTime
+  verifiedAt DateTime?
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([identifier, type])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Link {
   id String @id @db.Uuid
 
   title       String
   description String?
 
-  thumbnail         String?
-  thumbnailPublicId String?
-
-  logo         String?
-  logoPublicId String?
-
   url   String
   color String?
 
+  thumbnail         String?
+  thumbnailPublicId String?
+  logo              String?
+  logoPublicId      String?
+
   isActive Boolean @default(true)
+  position Int     @default(0)
 
-  position   Int    @default(0)
-  clickCount BigInt @default(0)
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  analytics LinkAnalytics[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([userId, url])
   @@index([title])
   @@index([position])
   @@index([userId])
 }
 
-enum AuthProvider {
-  CREDENTIALS
-  GOOGLE
-  GITHUB
+model LinkAnalytics {
+  id String @id @db.Uuid
+
+  ipAddress String?
+  country   String?
+  city      String?
+  userAgent String?
+  browser   String?
+  os        String?
+  device    DeviceType?
+  referer   String?
+
+  visitorId String? @db.Uuid
+
+  clickedAt DateTime @default(now())
+
+  linkId String @db.Uuid
+  link   Link   @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId])
+  @@index([clickedAt])
+  @@index([country])
+  @@index([visitorId])
 }
