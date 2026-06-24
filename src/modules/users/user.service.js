@@ -78,9 +78,13 @@ class UserService {
       throw ApiError.notFound(UserMessages.Errors.NOT_FOUND);
     }
 
-    const hasUpdates = getChangedFields(existingUser, data);
+    const changedFields = getChangedFields(existingUser, data);
 
-    const user = await this.#userRepo.update(id, hasUpdates);
+    if (!hasChanges(existingUser, data)) {
+      return existingUser;
+    }
+
+    const user = await this.#userRepo.update(id, changedFields);
 
     if (!user) {
       throw ApiError.internalServerError(UserMessages.Errors.UPDATE_FAILED);
