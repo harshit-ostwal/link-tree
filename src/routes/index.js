@@ -27,13 +27,16 @@ router.get("/", (_, res) => {
  */
 router.use("/health", healthRoute);
 
-router.use("/users", (await import("../modules/users/user.route.js")).default);
+router.use(
+  "/users",
+  (await import("../modules/users/user.route.js")).userRouter
+);
 
 router.use("/auth", (await import("../modules/auth/auth.route.js")).default);
 
 router.use(
   "/profile",
-  (await import("../modules/profile/profile.route.js")).default
+  (await import("../modules/profile/profile.route.js")).profileRouter
 );
 
 router.use(

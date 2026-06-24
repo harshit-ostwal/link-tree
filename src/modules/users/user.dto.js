@@ -1,9 +1,15 @@
 class UserDto {
-  constructor(data) {
-    this.id = data.id;
-    this.email = data.email;
-    this.username = data.username;
+  constructor(user) {
+    this.id = user.id;
+
+    this.email = user.email;
+    this.emailVerifiedAt = user.emailVerifiedAt;
+
+    this.username = user.username;
+
+    this.role = user.role;
+    this.status = user.status;
   }
 }
 
-export { UserDto };
+export default UserDto;

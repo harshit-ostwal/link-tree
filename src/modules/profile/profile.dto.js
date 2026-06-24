@@ -1,8 +1,11 @@
 class ProfileDto {
-  constructor(data) {
-    this.firstName = data.firstName;
-    this.lastName = data.lastName;
-    this.avatar = data.avatar;
+  constructor(profile) {
+    this.firstName = profile.firstName;
+    this.lastName = profile.lastName;
+    this.avatar = profile.avatar;
+    this.banner = profile.banner;
+    this.bio = profile.bio;
+    this.userId = profile.userId;
   }
 }
 

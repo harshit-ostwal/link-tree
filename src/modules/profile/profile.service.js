@@ -2,41 +2,34 @@ import ApiError from "../../core/http/api.error.js";
 import { CLOUDINARY_FOLDERS } from "../../infrastructure/storage/cloudinary/cloudinary.constants.js";
 import CloudinaryManager from "../../infrastructure/storage/cloudinary/cloudinary.manager.js";
 import { getChangedFields } from "../../shared/utils/object.utils.js";
+import ProfileMessages from "./profile.messages.js";
 import { ProfileRepository } from "./profile.repository.js";
 
 class ProfileService {
   #profileRepo;
-
-  constructor(prismaClient) {
-    this.#profileRepo = new ProfileRepository(prismaClient);
+  /**
+   * @param {ProfileRepository} profileRepository
+   */
+  constructor(profileRepository) {
+    this.#profileRepo = profileRepository;
   }
 
   async getProfileByUserId(userId) {
     const profile = await this.#profileRepo.findByUserId(userId);
 
     if (!profile) {
-      throw ApiError.notFound("Profile not found. Please try again later.");
+      throw ApiError.notFound(ProfileMessages.Errors.NOT_FOUND);
     }
 
     return profile;
   }
 
-  async findProfileByUserId(userId) {
-    return await this.#profileRepo.findByUserId(userId);
-  }
+  async upsertProfileByUserId(userId, data, files) {
+    const existingProfile = await this.#profileRepo.findByUserId(userId);
 
-  async createProfile(userId, data, avatarLocalFile) {
-    const existingProfile = await this.findProfileByUserId(userId);
-
-    if (existingProfile) {
-      throw ApiError.conflict(
-        "Profile already exists. Please try again later."
-      );
-    }
-
-    if (avatarLocalFile && !data.avatar) {
+    if (files?.avatar?.[0] && !data.avatar) {
       const avatar = await CloudinaryManager.uploadImage(
-        avatarLocalFile,
+        files.avatar[0].path,
         CLOUDINARY_FOLDERS.USER_AVATAR
       );
 
@@ -46,40 +39,65 @@ class ProfileService {
       }
     }
 
-    const profile = await this.#profileRepo.create(userId, data);
+    if (files?.banner?.[0] && !data.banner) {
+      const banner = await CloudinaryManager.uploadImage(
+        files.banner[0].path,
+        CLOUDINARY_FOLDERS.USER_BANNER
+      );
+
+      if (banner?.secure_url) {
+        data.banner = banner.secure_url;
+        data.bannerPublicId = banner.public_id;
+      }
+    }
+
+    const changedFields = getChangedFields(existingProfile, data);
+
+    if (!hasChanges(existingProfile, data)) {
+      return existingProfile;
+    }
+
+    const profile = await this.#profileRepo.upsertByUserId(
+      userId,
+      changedFields
+    );
 
     if (!profile) {
       if (data.avatarPublicId) {
         await CloudinaryManager.deleteImage(data.avatarPublicId);
       }
+      if (data.bannerPublicId) {
+        await CloudinaryManager.deleteImage(data.bannerPublicId);
+      }
+
+      throw ApiError.internalServerError(ProfileMessages.Errors.UPDATE_FAILED);
+    }
+
+    if (existingProfile?.avatarPublicId && changedFields.avatarPublicId) {
+      await CloudinaryManager.deleteImage(existingProfile.avatarPublicId);
+    }
+    if (existingProfile?.bannerPublicId && changedFields.bannerPublicId) {
+      await CloudinaryManager.deleteImage(existingProfile.bannerPublicId);
     }
 
     return profile;
   }
 
-  async updateProfile(userId, data, avatarLocalFile) {
+  async deleteProfileByUserId(userId) {
     const existingProfile = await this.getProfileByUserId(userId);
 
-    const hasUpdates = getChangedFields(existingProfile, data);
-
-    if (avatarLocalFile) {
-      const avatar = await CloudinaryManager.uploadImage(
-        avatarLocalFile,
-        CLOUDINARY_FOLDERS.USER_AVATAR
-      );
-
-      if (avatar?.secure_url) {
-        hasUpdates.avatar = avatar.secure_url;
-        hasUpdates.avatarPublicId = avatar.public_id;
-      }
+    if (existingProfile.avatarPublicId) {
+      await CloudinaryManager.deleteImage(existingProfile.avatarPublicId);
     }
 
-    const profile = await this.#profileRepo.updateByUserId(userId, hasUpdates);
+    if (existingProfile.bannerPublicId) {
+      await CloudinaryManager.deleteImage(existingProfile.bannerPublicId);
+    }
+
+    const profile = await this.#profileRepo.deleteByUserId(userId);
 
     if (!profile) {
-      if (hasUpdates.avatarPublicId) {
-        await CloudinaryManager.deleteImage(hasUpdates.avatarPublicId);
-      }
+      throw ApiError.internalServerError(ProfileMessages.Errors.DELETE_FAILED);
     }
 
     return profile;

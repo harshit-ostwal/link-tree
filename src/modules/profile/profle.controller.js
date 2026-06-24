@@ -1,13 +1,16 @@
 import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
 import { ProfileDto } from "./profile.dto.js";
+import ProfileMessages from "./profile.messages.js";
 import { ProfileService } from "./profile.service.js";
 
 class ProfileController {
   #profileService;
-
-  constructor() {
-    this.#profileService = new ProfileService();
+  /**
+   * @param {ProfileService} profileService
+   */
+  constructor(profileService) {
+    this.#profileService = profileService;
   }
 
   getProfileByUserId = asyncHandler(async (req, res) => {
@@ -17,43 +20,37 @@ class ProfileController {
 
     return ApiResponse.ok(
       new ProfileDto(profile),
-      "Profile retrieved successfully."
+      ProfileMessages.Responses.FETCHED
     ).send(res);
   });
 
-  createProfile = asyncHandler(async (req, res) => {
+  upsertProfileByUserId = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const data = req.body;
-    const avatarLocalFile = req.file?.path || null;
+    const files = req.files;
 
-    const profile = await this.#profileService.createProfile(
+    const profile = await this.#profileService.upsertProfileByUserId(
       userId,
       data,
-      avatarLocalFile
-    );
-
-    return ApiResponse.created(
-      new ProfileDto(profile),
-      "Profile created successfully."
-    ).send(res);
-  });
-
-  updateProfile = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
-    const data = req.body;
-    const avatarLocalFile = req.file?.path || null;
-
-    const profile = await this.#profileService.updateProfile(
-      userId,
-      data,
-      avatarLocalFile
+      files
     );
 
     return ApiResponse.ok(
       new ProfileDto(profile),
-      "Profile updated successfully."
+      ProfileMessages.Responses.UPDATED
+    ).send(res);
+  });
+
+  deleteProfileByUserId = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+
+    const profile = await this.#profileService.deleteProfileByUserId(userId);
+
+    return ApiResponse.ok(
+      new ProfileDto(profile),
+      ProfileMessages.Responses.DELETED
     ).send(res);
   });
 }
 
-export default new ProfileController();
+export { ProfileController };

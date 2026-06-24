@@ -2,39 +2,50 @@ import createRouter from "../../core/factories/router.factory.js";
 import validate from "../../core/middlewares/validate.middleware.js";
 import ValidationSource from "../../shared/constants/validation.constants.js";
 import { idParamSchema } from "../../shared/schemas/uuid.schema.js";
-import { authorizeUserOwner } from "./user.authorization.js";
-import userController from "./user.controller.js";
-import { emailParamSchema, updateUserSchema } from "./user.schema.js";
+import { requireSelfOrAdmin } from "./user.authoriztion.js";
+import { userController } from "./user.container.js";
+import {
+  emailParamSchema,
+  identifierParamSchema,
+  updateUserSchema,
+  usernameParamSchema,
+} from "./user.schema.js";
 
 const router = createRouter();
 
-router.patch(
-  "/",
-  validate(idParamSchema, ValidationSource.USER),
-  authorizeUserOwner,
-  validate(updateUserSchema),
-  userController.updateUser
+router.get(
+  "/email/:email",
+  validate(emailParamSchema, ValidationSource.PARAMS),
+  userController.getUserByEmail
 );
-
-router.delete(
-  "/",
-  validate(idParamSchema, ValidationSource.USER),
-  authorizeUserOwner,
-  userController.deleteUser
+router.get(
+  "/username/:username",
+  validate(usernameParamSchema, ValidationSource.PARAMS),
+  userController.getUserByUsername
 );
 
 router.get(
-  "/:identifier",
-  validate(emailParamSchema, ValidationSource.PARAMS),
-  authorizeUserOwner,
+  "/identifier/:identifier",
+  validate(identifierParamSchema, ValidationSource.PARAMS),
   userController.getUserByIdentifier
 );
 
-router.get(
-  "/:id",
+router
+  .route("/:id")
+  .all(validate(idParamSchema, ValidationSource.PARAMS))
+  .get(userController.getUserById)
+  .patch(
+    requireSelfOrAdmin,
+    validate(updateUserSchema),
+    userController.updateUserById
+  )
+  .delete(requireSelfOrAdmin, userController.softDeleteUserById);
+
+router.delete(
+  "/:id/hard",
   validate(idParamSchema, ValidationSource.PARAMS),
-  authorizeUserOwner,
-  userController.getUserById
+  requireSelfOrAdmin,
+  userController.hardDeleteUserById
 );
 
-export default router;
+export { router as userRouter };
