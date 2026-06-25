@@ -4,8 +4,8 @@ import ApiError from "../http/api.error.js";
 const notFound = (req, _res, next) => {
   return next(
     ApiError.notFound(
-      `Route "${req.originalUrl}" was not found. See /api/${API_VERSION}/docs for available endpoints.`
-    )
+      `Route "${req.originalUrl}" was not found. See /api/${API_VERSION}/docs for available endpoints.`,
+    ),
   );
 };
 

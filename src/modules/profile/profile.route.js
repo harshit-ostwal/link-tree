@@ -21,7 +21,7 @@ router
       },
     ]),
     validate(updateProfileSchema),
-    profileController.upsertProfileByUserId
+    profileController.upsertProfileByUserId,
   )
   .delete(profileController.deleteProfileByUserId);
 

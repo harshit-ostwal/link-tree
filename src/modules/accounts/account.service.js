@@ -36,7 +36,7 @@ class AccountService {
   async getAccountByProviderAndProviderId(provider, providerId) {
     const account = await this.#accountRepo.findByProviderAndProviderId(
       provider,
-      providerId
+      providerId,
     );
 
     if (!account) {
@@ -49,7 +49,7 @@ class AccountService {
   async getAccountByUserIdAndProvider(userId, provider) {
     const account = await this.#accountRepo.findByUserIdAndProvider(
       userId,
-      provider
+      provider,
     );
 
     if (!account) {
@@ -62,7 +62,7 @@ class AccountService {
   async createAccountByUserId(userId, data) {
     const existingAccount = await this.#accountRepo.findByUserIdAndProvider(
       userId,
-      data.provider
+      data.provider,
     );
 
     if (existingAccount) {

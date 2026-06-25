@@ -8,7 +8,7 @@ class ApiResponse {
     statusCode = HTTP_STATUS.OK,
     data = null,
     message = HTTP_MESSAGES.OK ?? "Success",
-    meta
+    meta,
   ) {
     if (!Number.isInteger(statusCode) || statusCode < 100 || statusCode > 599) {
       throw new TypeError(`Invalid HTTP status code: ${statusCode}`);
@@ -52,19 +52,19 @@ class ApiResponse {
   static paginated(
     items,
     { page, limit, total },
-    message = HTTP_MESSAGES.OK ?? "OK"
+    message = HTTP_MESSAGES.OK ?? "OK",
   ) {
     if (!Number.isInteger(limit) || limit < 1)
       throw new TypeError(
-        `Pagination "limit" must be a positive integer, got: ${limit}`
+        `Pagination "limit" must be a positive integer, got: ${limit}`,
       );
     if (!Number.isInteger(page) || page < 1)
       throw new TypeError(
-        `Pagination "page" must be a positive integer, got: ${page}`
+        `Pagination "page" must be a positive integer, got: ${page}`,
       );
     if (!Number.isInteger(total) || total < 0)
       throw new TypeError(
-        `Pagination "total" must be a non-negative integer, got: ${total}`
+        `Pagination "total" must be a non-negative integer, got: ${total}`,
       );
 
     const totalPages = total === 0 ? 0 : Math.ceil(total / limit);

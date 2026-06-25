@@ -18,7 +18,7 @@ const generateToken = (user, type) => {
 
   if (!config) {
     throw ApiError.internalServerError(
-      `Invalid token type: ${type}. Please try again later.`
+      `Invalid token type: ${type}. Please try again later.`,
     );
   }
 
@@ -44,7 +44,7 @@ const verifyToken = (token, type) => {
 
     if (!config) {
       throw ApiError.internalServerError(
-        `Invalid token type: ${type}. Please try again later.`
+        `Invalid token type: ${type}. Please try again later.`,
       );
     }
 
@@ -57,7 +57,7 @@ const verifyToken = (token, type) => {
     throw error.name === "TokenExpiredError"
       ? ApiError.unauthorized(
           "Token has expired. Please try again later.",
-          error
+          error,
         )
       : ApiError.unauthorized("Invalid token. Please try again later.", error);
   }
@@ -73,7 +73,7 @@ const generateAuthTokens = (user) => {
 
     hashedRefreshToken: refreshToken.hashedToken,
     refreshTokenExpiryAt: new Date(
-      Date.now() + parseInt(REFRESH_TOKEN_EXPIRY_MS, 10)
+      Date.now() + parseInt(REFRESH_TOKEN_EXPIRY_MS, 10),
     ),
   };
 };

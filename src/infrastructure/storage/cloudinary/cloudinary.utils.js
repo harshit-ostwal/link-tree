@@ -31,7 +31,7 @@ export const validateFile = async (file) => {
     await cleanupManager.deleteLocalFile(file);
 
     throw ApiError.badRequest(
-      `Invalid file format: ${extension}. Allowed formats are: ${ALLOWED_IMAGE_FORMATS.join(", ")}`
+      `Invalid file format: ${extension}. Allowed formats are: ${ALLOWED_IMAGE_FORMATS.join(", ")}`,
     );
   }
 
@@ -41,7 +41,7 @@ export const validateFile = async (file) => {
     await cleanupManager.deleteLocalFile(file);
 
     throw ApiError.badRequest(
-      `File size exceeds the maximum limit of ${MAX_FILE_SIZE / (1024 * 1024)} MB`
+      `File size exceeds the maximum limit of ${MAX_FILE_SIZE / (1024 * 1024)} MB`,
     );
   }
 };

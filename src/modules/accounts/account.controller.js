@@ -20,7 +20,7 @@ class AccountController {
 
     return ApiResponse.ok(
       new AccountDto(account),
-      AccountMessages.Responses.FETCHED
+      AccountMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -31,7 +31,7 @@ class AccountController {
 
     return ApiResponse.ok(
       new AccountDto(account),
-      AccountMessages.Responses.FETCHED
+      AccountMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -42,12 +42,12 @@ class AccountController {
     const account =
       await this.#accountService.getAccountByProviderAndProviderId(
         provider,
-        providerId
+        providerId,
       );
 
     return ApiResponse.ok(
       new AccountDto(account),
-      AccountMessages.Responses.FETCHED
+      AccountMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -57,12 +57,12 @@ class AccountController {
 
     const account = await this.#accountService.getAccountByUserIdAndProvider(
       userId,
-      provider
+      provider,
     );
 
     return ApiResponse.ok(
       new AccountDto(account),
-      AccountMessages.Responses.FETCHED
+      AccountMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -72,12 +72,12 @@ class AccountController {
 
     const account = await this.#accountService.createAccountByUserId(
       userId,
-      data
+      data,
     );
 
     return ApiResponse.created(
       new AccountDto(account),
-      AccountMessages.Responses.CREATED
+      AccountMessages.Responses.CREATED,
     ).send(res);
   });
 
@@ -89,7 +89,7 @@ class AccountController {
 
     return ApiResponse.ok(
       new AccountDto(account),
-      AccountMessages.Responses.UPDATED
+      AccountMessages.Responses.UPDATED,
     ).send(res);
   });
 
@@ -100,7 +100,7 @@ class AccountController {
 
     return ApiResponse.ok(
       new AccountDto(account),
-      AccountMessages.Responses.DELETED
+      AccountMessages.Responses.DELETED,
     ).send(res);
   });
 
@@ -111,7 +111,7 @@ class AccountController {
 
     return ApiResponse.ok(
       accounts.map((account) => new AccountDto(account)),
-      AccountMessages.Responses.DELETED
+      AccountMessages.Responses.DELETED,
     ).send(res);
   });
 }

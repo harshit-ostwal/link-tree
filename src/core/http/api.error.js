@@ -10,7 +10,7 @@ class ApiError extends Error {
     message = HTTP_MESSAGES.INTERNAL_SERVER_ERROR,
     errors = [],
     isOperational = true,
-    options = {}
+    options = {},
   ) {
     const { cause, code, stack } = options ?? {};
 
@@ -70,7 +70,7 @@ class ApiError extends Error {
       {
         cause: error,
         code: error instanceof Error ? error.code : undefined,
-      }
+      },
     );
   }
 
@@ -107,7 +107,7 @@ class ApiError extends Error {
   // 413
   static payloadTooLarge(
     message = HTTP_MESSAGES.PAYLOAD_TOO_LARGE,
-    errors = []
+    errors = [],
   ) {
     return new ApiError(HTTP_STATUS.PAYLOAD_TOO_LARGE, message, errors);
   }
@@ -115,7 +115,7 @@ class ApiError extends Error {
   // 415
   static unsupportedMediaType(
     message = HTTP_MESSAGES.UNSUPPORTED_MEDIA_TYPE,
-    errors = []
+    errors = [],
   ) {
     return new ApiError(HTTP_STATUS.UNSUPPORTED_MEDIA_TYPE, message, errors);
   }
@@ -123,7 +123,7 @@ class ApiError extends Error {
   // 422
   static validationError(
     message = HTTP_MESSAGES.VALIDATION_ERROR,
-    errors = []
+    errors = [],
   ) {
     return new ApiError(HTTP_STATUS.UNPROCESSABLE_ENTITY, message, errors);
   }
@@ -131,7 +131,7 @@ class ApiError extends Error {
   // 429
   static tooManyRequests(
     message = HTTP_MESSAGES.TOO_MANY_REQUESTS,
-    errors = []
+    errors = [],
   ) {
     return new ApiError(HTTP_STATUS.TOO_MANY_REQUESTS, message, errors);
   }
@@ -139,7 +139,7 @@ class ApiError extends Error {
   // 500
   static internalServerError(
     message = HTTP_MESSAGES.INTERNAL_SERVER_ERROR,
-    errors = []
+    errors = [],
   ) {
     return new ApiError(HTTP_STATUS.INTERNAL_SERVER_ERROR, message, errors);
   }
@@ -157,7 +157,7 @@ class ApiError extends Error {
   // 503
   static serviceUnavailable(
     message = HTTP_MESSAGES.SERVICE_UNAVAILABLE,
-    errors = []
+    errors = [],
   ) {
     return new ApiError(HTTP_STATUS.SERVICE_UNAVAILABLE, message, errors);
   }

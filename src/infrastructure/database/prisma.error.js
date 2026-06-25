@@ -20,7 +20,7 @@ const mapPrismaError = (error) => {
     // Value too long
     case "P2000":
       return ApiError.validationError(
-        "Input value exceeds the allowed length."
+        "Input value exceeds the allowed length.",
       );
 
     // Unique constraint

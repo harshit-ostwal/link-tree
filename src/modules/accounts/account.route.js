@@ -24,14 +24,14 @@ router.get(
   "/user/:provider",
   validate(userIdParamSchema, ValidationSource.PARAMS),
   validate(providerParams, ValidationSource.PARAMS),
-  accountController.getAccountByUserIdAndProvider
+  accountController.getAccountByUserIdAndProvider,
 );
 
 router.get(
   "/provider/:provider/:providerId",
   validate(providerParams, ValidationSource.PARAMS),
   validate(providerIdParams, ValidationSource.PARAMS),
-  accountController.getAccountByProviderAndProviderId
+  accountController.getAccountByProviderAndProviderId,
 );
 
 router

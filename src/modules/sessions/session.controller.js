@@ -20,7 +20,7 @@ class SessionController {
 
     return ApiResponse.ok(
       new SessionDto(session),
-      SessionMessages.Responses.FETCHED
+      SessionMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -31,7 +31,7 @@ class SessionController {
 
     return ApiResponse.ok(
       sessions.map((session) => new SessionDto(session)),
-      SessionMessages.Responses.FETCHED_ALL
+      SessionMessages.Responses.FETCHED_ALL,
     ).send(res);
   });
 
@@ -45,12 +45,12 @@ class SessionController {
 
     const session = await this.#sessionService.createSessionByUserId(
       userId,
-      data
+      data,
     );
 
     return ApiResponse.created(
       new SessionDto(session),
-      SessionMessages.Responses.CREATED
+      SessionMessages.Responses.CREATED,
     ).send(res);
   });
 
@@ -66,7 +66,7 @@ class SessionController {
 
     return ApiResponse.ok(
       new SessionDto(session),
-      SessionMessages.Responses.UPDATED
+      SessionMessages.Responses.UPDATED,
     ).send(res);
   });
 
@@ -85,7 +85,7 @@ class SessionController {
     await this.#sessionService.deleteSessionsByUserId(userId);
 
     return ApiResponse.ok(null, SessionMessages.Responses.DELETED_ALL).send(
-      res
+      res,
     );
   });
 }

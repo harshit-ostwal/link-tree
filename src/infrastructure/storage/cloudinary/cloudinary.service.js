@@ -24,7 +24,7 @@ class CloudinaryService {
 
       throw ApiError.internalServerError(
         "Failed to upload image to Cloudinary",
-        error
+        error,
       );
     }
   }
@@ -36,7 +36,7 @@ class CloudinaryService {
     } catch (error) {
       throw ApiError.internalServerError(
         "Failed to delete image from Cloudinary",
-        error
+        error,
       );
     }
   }
@@ -48,7 +48,7 @@ class CloudinaryService {
     } catch (error) {
       throw ApiError.internalServerError(
         "Failed to delete images from Cloudinary",
-        error
+        error,
       );
     }
   }

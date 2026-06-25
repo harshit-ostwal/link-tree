@@ -21,7 +21,7 @@ const securityMiddleware = (app) => {
   app.use(
     morgan(":id - :method :url :status - :response-time ms", {
       stream: logger.stream,
-    })
+    }),
   );
 
   app.use(helmet(helmetConfig));
@@ -37,14 +37,14 @@ const securityMiddleware = (app) => {
       limit: REQUEST_SIZE_LIMIT,
       strict: true,
       type: "application/json",
-    })
+    }),
   );
 
   app.use(
     express.urlencoded({
       extended: true,
       limit: REQUEST_SIZE_LIMIT,
-    })
+    }),
   );
 };
 

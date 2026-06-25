@@ -30,7 +30,7 @@ class ProfileService {
     if (files?.avatar?.[0] && !data.avatar) {
       const avatar = await CloudinaryManager.uploadImage(
         files.avatar[0].path,
-        CLOUDINARY_FOLDERS.USER_AVATAR
+        CLOUDINARY_FOLDERS.USER_AVATAR,
       );
 
       if (avatar?.secure_url) {
@@ -42,7 +42,7 @@ class ProfileService {
     if (files?.banner?.[0] && !data.banner) {
       const banner = await CloudinaryManager.uploadImage(
         files.banner[0].path,
-        CLOUDINARY_FOLDERS.USER_BANNER
+        CLOUDINARY_FOLDERS.USER_BANNER,
       );
 
       if (banner?.secure_url) {
@@ -59,7 +59,7 @@ class ProfileService {
 
     const profile = await this.#profileRepo.upsertByUserId(
       userId,
-      changedFields
+      changedFields,
     );
 
     if (!profile) {

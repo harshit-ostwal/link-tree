@@ -13,7 +13,7 @@ async function startServer() {
 
     const server = app.listen(Number(PORT), () => {
       loggerService.info(
-        `Server started successfully on port ${PORT} in ${NODE_ENV} mode.`
+        `Server started successfully on port ${PORT} in ${NODE_ENV} mode.`,
       );
     });
 

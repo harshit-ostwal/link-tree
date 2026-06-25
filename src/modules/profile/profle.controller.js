@@ -20,7 +20,7 @@ class ProfileController {
 
     return ApiResponse.ok(
       new ProfileDto(profile),
-      ProfileMessages.Responses.FETCHED
+      ProfileMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -32,12 +32,12 @@ class ProfileController {
     const profile = await this.#profileService.upsertProfileByUserId(
       userId,
       data,
-      files
+      files,
     );
 
     return ApiResponse.ok(
       new ProfileDto(profile),
-      ProfileMessages.Responses.UPDATED
+      ProfileMessages.Responses.UPDATED,
     ).send(res);
   });
 
@@ -48,7 +48,7 @@ class ProfileController {
 
     return ApiResponse.ok(
       new ProfileDto(profile),
-      ProfileMessages.Responses.DELETED
+      ProfileMessages.Responses.DELETED,
     ).send(res);
   });
 }

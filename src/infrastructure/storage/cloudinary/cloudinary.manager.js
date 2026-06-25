@@ -23,7 +23,7 @@ class CloudinaryManager {
     const images = await Promise.all(
       files.map(async (file) => {
         return await CloudinaryService.upload(file, folder, uploadOptions);
-      })
+      }),
     );
     return images;
   }
@@ -32,7 +32,7 @@ class CloudinaryManager {
     publicId,
     file,
     folder = CLOUDINARY_FOLDERS.DEFAULT,
-    options = {}
+    options = {},
   ) {
     if (!publicId) {
       throw ApiError.badRequest("No public ID provided for update");
@@ -47,7 +47,7 @@ class CloudinaryManager {
     const existingImage = await CloudinaryService.delete(publicId);
     if (!existingImage) {
       throw ApiError.notFound(
-        `Image with public ID ${publicId} not found for update`
+        `Image with public ID ${publicId} not found for update`,
       );
     }
 
@@ -59,7 +59,7 @@ class CloudinaryManager {
     publicIds,
     files,
     folder = CLOUDINARY_FOLDERS.DEFAULT,
-    options = {}
+    options = {},
   ) {
     if (!publicIds?.length) {
       throw ApiError.badRequest("No public IDs provided for update");
@@ -71,14 +71,14 @@ class CloudinaryManager {
 
     if (publicIds.length !== files.length) {
       throw ApiError.badRequest(
-        "Number of public IDs must match number of files"
+        "Number of public IDs must match number of files",
       );
     }
 
     return await Promise.all(
       publicIds.map((publicId, index) =>
-        this.updateImage(publicId, files[index], folder, options)
-      )
+        this.updateImage(publicId, files[index], folder, options),
+      ),
     );
   }
 

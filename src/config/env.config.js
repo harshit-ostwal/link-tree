@@ -13,13 +13,13 @@ if (fs.existsSync(envFile)) {
   console.info(`\n 🌱 Loaded environment variables from: ${envFile} \n`);
 } else if (fs.existsSync(defaultEnvFile)) {
   console.warn(
-    `\n ⚠️ ${envFile} not found. Falling back to ${defaultEnvFile}. \n`
+    `\n ⚠️ ${envFile} not found. Falling back to ${defaultEnvFile}. \n`,
   );
   path = defaultEnvFile;
   console.info(`\n 🌱 Loaded environment variables from: ${defaultEnvFile} \n`);
 } else {
   console.error(
-    `\n ❌ No environment file found. Please create either ${envFile} or ${defaultEnvFile}. \n`
+    `\n ❌ No environment file found. Please create either ${envFile} or ${defaultEnvFile}. \n`,
   );
 }
 
@@ -40,7 +40,7 @@ const env = parsedEnv.success ? parsedEnv.data : {};
 if (!parsedEnv.success) {
   console.error(
     "❌ Invalid environment variables:",
-    parsedEnv.error.flatten().fieldErrors
+    parsedEnv.error.flatten().fieldErrors,
   );
 }
 

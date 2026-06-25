@@ -59,10 +59,10 @@ class CleanupManager {
           } catch (error) {
             loggerService.error(`Failed processing file: ${filePath}`, error);
           }
-        })
+        }),
       );
       loggerService.info(
-        `Temp directory cleanup completed. Deleted ${deletedCount} expired file(s).`
+        `Temp directory cleanup completed. Deleted ${deletedCount} expired file(s).`,
       );
     } catch (error) {
       loggerService.error("❌ Failed to clear temp directory.", error);

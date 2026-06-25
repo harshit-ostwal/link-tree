@@ -19,5 +19,5 @@ export const loggerFormat = combine(
     stack: !isProduction,
   }),
   logFormat,
-  prettyPrint()
+  prettyPrint(),
 );

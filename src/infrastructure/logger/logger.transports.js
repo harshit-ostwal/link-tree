@@ -15,7 +15,7 @@ export const loggerTransports = [
         level: true,
         colors: LOGGER_COLORS,
       }),
-      logFormat
+      logFormat,
     ),
   }),
 ];
