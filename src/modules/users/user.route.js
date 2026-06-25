@@ -22,18 +22,18 @@ router
 router.get(
   "/email/:email",
   validate(emailParamSchema, ValidationSource.PARAMS),
-  userController.getUserByEmail
+  userController.getUserByEmail,
 );
 router.get(
   "/username/:username",
   validate(usernameParamSchema, ValidationSource.PARAMS),
-  userController.getUserByUsername
+  userController.getUserByUsername,
 );
 
 router.get(
   "/identifier/:identifier",
   validate(identifierParamSchema, ValidationSource.PARAMS),
-  userController.getUserByIdentifier
+  userController.getUserByIdentifier,
 );
 
 router
@@ -43,7 +43,7 @@ router
   .patch(
     requireSelfOrAdmin,
     validate(updateUserSchema),
-    userController.updateUserById
+    userController.updateUserById,
   )
   .delete(requireSelfOrAdmin, userController.softDeleteUserById);
 
@@ -51,7 +51,7 @@ router.delete(
   "/:id/hard",
   validate(idParamSchema, ValidationSource.PARAMS),
   requireSelfOrAdmin,
-  userController.hardDeleteUserById
+  userController.hardDeleteUserById,
 );
 
 export { router as userRouter };

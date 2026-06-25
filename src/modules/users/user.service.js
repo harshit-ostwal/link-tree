@@ -65,7 +65,7 @@ class UserService {
   async createUser(data) {
     const existingUser = await this.#userRepo.findByEmailOrUsername(
       data.username,
-      data.email
+      data.email,
     );
 
     if (existingUser) {

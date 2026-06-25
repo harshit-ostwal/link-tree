@@ -18,7 +18,7 @@ class UserController {
 
     return ApiResponse.ok(
       users.map((user) => new UserDto(user)),
-      UserMessages.Responses.FETCHED
+      UserMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -29,7 +29,7 @@ class UserController {
 
     return ApiResponse.ok(
       new UserDto(user),
-      UserMessages.Responses.FETCHED
+      UserMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -40,7 +40,7 @@ class UserController {
 
     return ApiResponse.ok(
       new UserDto(user),
-      UserMessages.Responses.FETCHED
+      UserMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -51,7 +51,7 @@ class UserController {
 
     return ApiResponse.ok(
       new UserDto(user),
-      UserMessages.Responses.FETCHED
+      UserMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -62,7 +62,7 @@ class UserController {
 
     return ApiResponse.ok(
       new UserDto(user),
-      UserMessages.Responses.FETCHED
+      UserMessages.Responses.FETCHED,
     ).send(res);
   });
 
@@ -73,7 +73,7 @@ class UserController {
 
     return ApiResponse.created(
       new UserDto(user),
-      UserMessages.Responses.CREATED
+      UserMessages.Responses.CREATED,
     ).send(res);
   });
 
@@ -85,7 +85,7 @@ class UserController {
 
     return ApiResponse.ok(
       new UserDto(user),
-      UserMessages.Responses.UPDATED
+      UserMessages.Responses.UPDATED,
     ).send(res);
   });
 
@@ -96,7 +96,7 @@ class UserController {
 
     return ApiResponse.ok(
       new UserDto(user),
-      UserMessages.Responses.DELETED
+      UserMessages.Responses.DELETED,
     ).send(res);
   });
 
@@ -107,7 +107,7 @@ class UserController {
 
     return ApiResponse.ok(
       new UserDto(user),
-      UserMessages.Responses.DELETED
+      UserMessages.Responses.DELETED,
     ).send(res);
   });
 }

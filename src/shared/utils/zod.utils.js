@@ -66,7 +66,7 @@ const zCoerce = (fieldName, type, options = {}) => {
 
     default:
       throw ApiError.internalServerError(
-        `Unsupported zCoerce type "${type}" for field "${fieldName}"`
+        `Unsupported zCoerce type "${type}" for field "${fieldName}"`,
       );
   }
 };
@@ -107,7 +107,7 @@ const zArray = (
   itemSchema = z.any(),
   minLength = 1,
   maxLength = 100,
-  defaultValue = []
+  defaultValue = [],
 ) => {
   return z
     .array(itemSchema, { error: `Invalid ${fieldName}` })
