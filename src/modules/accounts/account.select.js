@@ -1,19 +1,15 @@
 const AccountSelect = {
   id: true,
-  provider: true,
-  lastLoginAt: true,
   userId: true,
-};
 
-const AccountCreateSelect = {
-  id: true,
   provider: true,
-  userId: true,
-};
+  providerId: true,
 
-const AccountWithCredentialsSelect = {
-  ...AccountSelect,
   password: true,
+  lastLoginAt: true,
+
+  createdAt: true,
+  updatedAt: true,
 };
 
-export { AccountCreateSelect, AccountSelect, AccountWithCredentialsSelect };
+export default AccountSelect;

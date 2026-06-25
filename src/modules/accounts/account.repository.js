@@ -1,16 +1,14 @@
-import prisma from "../../infrastructure/database/prisma.js";
+import { PrismaClient } from "../../infrastructure/database/generated/prisma/index.js";
 import generateUUID from "../../shared/utils/uuid.utils.js";
-import {
-  AccountCreateSelect,
-  AccountSelect,
-  AccountWithCredentialsSelect,
-} from "./account.select.js";
+import AccountSelect from "./account.select.js";
 
 class AccountRepository {
   #prisma;
-
-  constructor(client = prisma) {
-    this.#prisma = client;
+  /**
+   * @param {PrismaClient} prisma
+   */
+  constructor(prisma) {
+    this.#prisma = prisma;
   }
 
   async findById(id) {
@@ -31,18 +29,6 @@ class AccountRepository {
     });
   }
 
-  async findByProviderAndUserId(provider, userId) {
-    return await this.#prisma.account.findUnique({
-      where: {
-        provider_userId: {
-          provider,
-          userId,
-        },
-      },
-      select: AccountWithCredentialsSelect,
-    });
-  }
-
   async findByProviderAndProviderId(provider, providerId) {
     return await this.#prisma.account.findUnique({
       where: {
@@ -55,18 +41,41 @@ class AccountRepository {
     });
   }
 
+  async findByUserIdAndProvider(userId, provider) {
+    return await this.#prisma.account.findUnique({
+      where: {
+        userId_provider: {
+          userId,
+          provider,
+        },
+      },
+      select: AccountSelect,
+    });
+  }
+
   async create(userId, data) {
+    const { id, ...rest } = data;
     return await this.#prisma.account.create({
       data: {
-        id: generateUUID(),
         user: {
           connect: {
             id: userId,
           },
         },
-        ...data,
+        id: generateUUID(),
+        ...rest,
       },
-      select: AccountCreateSelect,
+      select: AccountSelect,
+    });
+  }
+
+  async update(id, data) {
+    return await this.#prisma.account.update({
+      where: {
+        id,
+      },
+      data,
+      select: AccountSelect,
     });
   }
 

@@ -11,14 +11,21 @@ const providerParams = z.strictObject({
 const accountSchema = z
   .strictObject({
     provider: zEnum("Provider", AuthProvider),
-    providerId: zString("Provider ID").optional(),
+    providerId: zString("Provider ID"),
     password: zPassword().optional(),
   })
   .strip();
 
 const createAccountSchema = accountSchema.partial({
-  providerId: false,
+  password: false,
+});
+const updateAccountSchema = accountSchema.partial({
   password: false,
 });
 
-export { createAccountSchema, providerIdParams, providerParams };
+export {
+  createAccountSchema,
+  providerIdParams,
+  providerParams,
+  updateAccountSchema,
+};

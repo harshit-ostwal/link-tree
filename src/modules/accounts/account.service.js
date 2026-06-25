@@ -1,85 +1,72 @@
 import ApiError from "../../core/http/api.error.js";
 import { hashValue } from "../../core/security/hash.security.js";
-import { AuthProvider } from "../../infrastructure/database/generated/prisma/index.js";
+import { getChangedFields, hasChanges } from "../../shared/utils/object.utils";
+import AccountMessages from "./account.messages.js";
 import { AccountRepository } from "./account.repository.js";
 
 class AccountService {
-  #accountRepository;
-
-  constructor(prisma) {
-    this.#accountRepository = new AccountRepository(prisma);
+  #accountRepo;
+  /**
+   * @param {AccountRepository} accountRepo
+   */
+  constructor(accountRepo) {
+    this.#accountRepo = accountRepo;
   }
 
   async getAccountById(id) {
-    const account = await this.#accountRepository.findById(id);
+    const account = await this.#accountRepo.findById(id);
 
     if (!account) {
-      throw ApiError.notFound("Account not found. Please try again later.");
+      throw ApiError(AccountMessages.Errors.NOT_FOUND);
     }
 
     return account;
   }
 
   async getAccountsByUserId(userId) {
-    const accounts = await this.#accountRepository.findByUserId(userId);
+    const accounts = await this.#accountRepo.findByUserId(userId);
 
     if (!accounts || accounts.length === 0) {
-      throw ApiError.notFound("Accounts not found. Please try again later.");
+      throw ApiError(AccountMessages.Errors.NOT_FOUND);
     }
 
     return accounts;
   }
 
-  async getAccountByProviderAndUserId(provider, userId) {
-    const account = await this.#accountRepository.findByProviderAndUserId(
-      provider,
-      userId
-    );
-
-    if (!account) {
-      throw ApiError.notFound("Account not found. Please try again later.");
-    }
-
-    return account;
-  }
-
-  async findAccountByProviderAndUserId(provider, userId) {
-    return await this.#accountRepository.findByProviderAndUserId(
-      provider,
-      userId
-    );
-  }
-
   async getAccountByProviderAndProviderId(provider, providerId) {
-    const account = await this.#accountRepository.findByProviderAndProviderId(
+    const account = await this.#accountRepo.findByProviderAndProviderId(
       provider,
       providerId
     );
 
     if (!account) {
-      throw ApiError.notFound("Account not found. Please try again later.");
+      throw ApiError(AccountMessages.Errors.NOT_FOUND);
     }
 
     return account;
   }
 
-  async findAccountByProviderAndProviderId(provider, providerId) {
-    return await this.#accountRepository.findByProviderAndProviderId(
-      provider,
-      providerId
+  async getAccountByUserIdAndProvider(userId, provider) {
+    const account = await this.#accountRepo.findByUserIdAndProvider(
+      userId,
+      provider
     );
+
+    if (!account) {
+      throw ApiError(AccountMessages.Errors.NOT_FOUND);
+    }
+
+    return account;
   }
 
-  async createAccount(userId, data) {
-    const existingAccount = await this.findAccountByProviderAndUserId(
-      data.provider || AuthProvider.CREDENTIALS,
-      userId
+  async createAccountByUserId(userId, data) {
+    const existingAccount = await this.#accountRepo.findByUserIdAndProvider(
+      userId,
+      data.provider
     );
 
     if (existingAccount) {
-      throw ApiError.conflict(
-        "Account already exists for this provider. Please try again later."
-      );
+      throw ApiError(AccountMessages.Errors.ALREADY_EXISTS);
     }
 
     if (data.password) {
@@ -87,17 +74,60 @@ class AccountService {
       data.password = hashedPassword;
     }
 
-    return await this.#accountRepository.create(userId, data);
+    const account = await this.#accountRepo.create(userId, data);
+
+    if (!account) {
+      throw ApiError.internalServerError(AccountMessages.Errors.CREATE_FAILED);
+    }
+
+    return account;
   }
 
-  async deleteAccount(id) {
+  async updateAccountById(id, data) {
+    const existingAccount = await this.getAccountById(id);
+
+    const changedFields = getChangedFields(existingAccount, data);
+
+    if (!hasChanges(existingAccount, data)) {
+      return existingAccount;
+    }
+
+    if (data.password) {
+      const hashedPassword = await hashValue(data.password);
+      changedFields.password = hashedPassword;
+    }
+
+    const account = await this.#accountRepo.update(id, changedFields);
+
+    if (!account) {
+      throw ApiError.internalServerError(AccountMessages.Errors.UPDATE_FAILED);
+    }
+
+    return account;
+  }
+
+  async deleteAccountById(id) {
     await this.getAccountById(id);
-    return await this.#accountRepository.delete(id);
+
+    const account = await this.#accountRepo.delete(id);
+
+    if (!account) {
+      throw ApiError.internalServerError(AccountMessages.Errors.DELETE_FAILED);
+    }
+
+    return account;
   }
 
   async deleteAccountsByUserId(userId) {
     await this.getAccountsByUserId(userId);
-    return await this.#accountRepository.deleteByUserId(userId);
+
+    const accounts = await this.#accountRepo.deleteByUserId(userId);
+
+    if (!accounts) {
+      throw ApiError.internalServerError(AccountMessages.Errors.DELETE_FAILED);
+    }
+
+    return accounts;
   }
 }
 
