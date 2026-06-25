@@ -8,7 +8,6 @@ const router = createRouter();
 
 router
   .route("/")
-  .all()
   .get(profileController.getProfileByUserId)
   .patch(
     upload.fields([

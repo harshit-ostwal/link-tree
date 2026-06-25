@@ -25,6 +25,11 @@ class ProfileRepository {
         userId,
       },
       create: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
         ...data,
       },
       update: {
