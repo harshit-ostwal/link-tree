@@ -13,10 +13,19 @@ class UserController {
     this.#userService = userService;
   }
 
+  getAllUsers = asyncHandler(async (_req, res) => {
+    const users = await this.#userService.getAllUsers();
+
+    return ApiResponse.ok(
+      users.map((user) => new UserDto(user)),
+      UserMessages.Responses.FETCHED
+    ).send(res);
+  });
+
   getUserById = asyncHandler(async (req, res) => {
     const id = req.params.id;
 
-    const user = await this.#userService.findUserById(id);
+    const user = await this.#userService.getUserById(id);
 
     return ApiResponse.ok(
       new UserDto(user),
@@ -27,7 +36,7 @@ class UserController {
   getUserByEmail = asyncHandler(async (req, res) => {
     const email = req.params.email;
 
-    const user = await this.#userService.findUserByEmail(email);
+    const user = await this.#userService.getUserByEmail(email);
 
     return ApiResponse.ok(
       new UserDto(user),
@@ -38,7 +47,7 @@ class UserController {
   getUserByUsername = asyncHandler(async (req, res) => {
     const username = req.params.username;
 
-    const user = await this.#userService.findUserByUsername(username);
+    const user = await this.#userService.getUserByUsername(username);
 
     return ApiResponse.ok(
       new UserDto(user),
@@ -49,7 +58,7 @@ class UserController {
   getUserByIdentifier = asyncHandler(async (req, res) => {
     const identifier = req.params.identifier;
 
-    const user = await this.#userService.findUserByIdentifier(identifier);
+    const user = await this.#userService.getUserByIdentifier(identifier);
 
     return ApiResponse.ok(
       new UserDto(user),

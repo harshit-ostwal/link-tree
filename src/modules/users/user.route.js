@@ -5,6 +5,7 @@ import { idParamSchema } from "../../shared/schemas/uuid.schema.js";
 import { requireSelfOrAdmin } from "./user.authoriztion.js";
 import { userController } from "./user.container.js";
 import {
+  createUserSchema,
   emailParamSchema,
   identifierParamSchema,
   updateUserSchema,
@@ -12,6 +13,11 @@ import {
 } from "./user.schema.js";
 
 const router = createRouter();
+
+router
+  .route("/")
+  .get(userController.getAllUsers)
+  .post(validate(createUserSchema), userController.createUser);
 
 router.get(
   "/email/:email",

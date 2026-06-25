@@ -14,6 +14,12 @@ class UserRepository {
     this.#prisma = prismaClient;
   }
 
+  async findAll() {
+    return await this.#prisma.user.findMany({
+      select: UserSelect,
+    });
+  }
+
   async findById(id) {
     return await this.#prisma.user.findFirst({
       where: {

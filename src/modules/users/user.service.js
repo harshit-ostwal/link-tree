@@ -12,7 +12,17 @@ class UserService {
     this.#userRepo = userRepository;
   }
 
-  async findUserById(id) {
+  async getAllUsers() {
+    const users = await this.#userRepo.findAll();
+
+    if (!users || users.length === 0) {
+      throw ApiError.notFound(UserMessages.Errors.NOT_FOUND);
+    }
+
+    return users;
+  }
+
+  async getUserById(id) {
     const user = await this.#userRepo.findById(id);
 
     if (!user) {
@@ -22,7 +32,7 @@ class UserService {
     return user;
   }
 
-  async findUserByEmail(email) {
+  async getUserByEmail(email) {
     const user = await this.#userRepo.findByEmail(email);
 
     if (!user) {
@@ -32,7 +42,7 @@ class UserService {
     return user;
   }
 
-  async findUserByUsername(username) {
+  async getUserByUsername(username) {
     const user = await this.#userRepo.findByUsername(username);
 
     if (!user) {
@@ -42,7 +52,7 @@ class UserService {
     return user;
   }
 
-  async findUserByIdentifier(identifier) {
+  async getUserByIdentifier(identifier) {
     const user = await this.#userRepo.findByIdentifier(identifier);
 
     if (!user) {
@@ -72,7 +82,7 @@ class UserService {
   }
 
   async updateUserById(id, data) {
-    const existingUser = await this.findUserById(id);
+    const existingUser = await this.getUserById(id);
 
     if (!existingUser) {
       throw ApiError.notFound(UserMessages.Errors.NOT_FOUND);
@@ -94,7 +104,7 @@ class UserService {
   }
 
   async softDeleteUserById(id) {
-    const existingUser = await this.findUserById(id);
+    const existingUser = await this.getUserById(id);
 
     if (!existingUser) {
       throw ApiError.notFound(UserMessages.Errors.NOT_FOUND);
@@ -110,7 +120,7 @@ class UserService {
   }
 
   async hardDeleteUserById(id) {
-    const existingUser = await this.findUserById(id);
+    const existingUser = await this.getUserById(id);
 
     if (!existingUser) {
       throw ApiError.notFound(UserMessages.Errors.NOT_FOUND);
