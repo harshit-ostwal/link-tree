@@ -52,7 +52,8 @@ model User {
   role   UserRole   @default(USER)
   status UserStatus @default(ACTIVE)
 
-  deletedAt DateTime?
+  deletedAt   DateTime?
+  onBoardedAt DateTime?
 
   profile       Profile?
   accounts      Account[]
