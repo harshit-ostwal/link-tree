@@ -72,7 +72,7 @@ const generateAuthTokens = (user) => {
     refreshToken: refreshToken.token,
 
     hashedRefreshToken: refreshToken.hashedToken,
-    refreshTokenExpiresAt: new Date(
+    refreshTokenExpiryAt: new Date(
       Date.now() + parseInt(REFRESH_TOKEN_EXPIRY_MS, 10)
     ),
   };
