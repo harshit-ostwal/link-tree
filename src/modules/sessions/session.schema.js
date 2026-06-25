@@ -4,7 +4,7 @@ import { zCoerce, zString, zToken } from "../../shared/utils/zod.utils.js";
 const sessionSchema = z
   .strictObject({
     refreshToken: zToken("Refresh Token"),
-    refreshTokenExpiresAt: zCoerce("Refresh Token Expiration Date", "date"),
+    refreshTokenExpiryAt: zCoerce("Refresh Token Expiration Date", "date"),
     ipAddress: zString("IP Address").optional(),
     userAgent: zString("User Agent").optional(),
   })

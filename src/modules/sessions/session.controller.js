@@ -1,22 +1,26 @@
 import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
 import { SessionDto } from "./session.dto.js";
+import SessionMessages from "./session.messages.js";
 import { SessionService } from "./session.service.js";
 
 class SessionController {
   #sessionService;
-  constructor() {
-    this.#sessionService = new SessionService();
+  /**
+   * @param {SessionService} sessionService
+   */
+  constructor(sessionService) {
+    this.#sessionService = sessionService;
   }
 
   getSessionById = asyncHandler(async (req, res) => {
-    const sessionId = req.params.id;
+    const id = req.params.id;
 
-    const session = await this.#sessionService.getSessionById(sessionId);
+    const session = await this.#sessionService.getSessionById(id);
 
     return ApiResponse.ok(
       new SessionDto(session),
-      "Session retrieved successfully"
+      SessionMessages.Responses.FETCHED
     ).send(res);
   });
 
@@ -27,41 +31,52 @@ class SessionController {
 
     return ApiResponse.ok(
       sessions.map((session) => new SessionDto(session)),
-      "Sessions retrieved successfully"
+      SessionMessages.Responses.FETCHED_ALL
     ).send(res);
   });
 
-  createSession = asyncHandler(async (req, res) => {
+  createSessionByUserId = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const data = req.body;
 
-    const session = await this.#sessionService.createSession(userId, data);
+    data.ipAddress =
+      req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    data.userAgent = req.headers["user-agent"] || "Unknown";
+
+    const session = await this.#sessionService.createSessionByUserId(
+      userId,
+      data
+    );
 
     return ApiResponse.created(
       new SessionDto(session),
-      "Session created successfully"
+      SessionMessages.Responses.CREATED
     ).send(res);
   });
 
-  updateSession = asyncHandler(async (req, res) => {
-    const sessionId = req.params.id;
+  updateSessionById = asyncHandler(async (req, res) => {
+    const id = req.params.id;
     const data = req.body;
 
-    const session = await this.#sessionService.updateSession(sessionId, data);
+    data.ipAddress =
+      req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    data.userAgent = req.headers["user-agent"] || "Unknown";
+
+    const session = await this.#sessionService.updateSessionById(id, data);
 
     return ApiResponse.ok(
       new SessionDto(session),
-      "Session updated successfully"
+      SessionMessages.Responses.UPDATED
     ).send(res);
   });
 
-  deleteSession = asyncHandler(async (req, res) => {
-    const sessionId = req.params.id;
+  deleteSessionById = asyncHandler(async (req, res) => {
+    const id = req.params.id;
     const userId = req.user.id;
 
-    await this.#sessionService.deleteSession(userId, sessionId);
+    await this.#sessionService.deleteSessionById(userId, id);
 
-    return ApiResponse.noContent("Session deleted successfully.").send(res);
+    return ApiResponse.ok(null, SessionMessages.Responses.DELETED).send(res);
   });
 
   deleteSessionsByUserId = asyncHandler(async (req, res) => {
@@ -69,8 +84,10 @@ class SessionController {
 
     await this.#sessionService.deleteSessionsByUserId(userId);
 
-    return ApiResponse.noContent("Sessions deleted successfully.").send(res);
+    return ApiResponse.ok(null, SessionMessages.Responses.DELETED_ALL).send(
+      res
+    );
   });
 }
 
-export default new SessionController();
+export { SessionController };

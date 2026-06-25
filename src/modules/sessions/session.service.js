@@ -1,53 +1,48 @@
 import ApiError from "../../core/http/api.error.js";
 import { generateAuthTokens } from "../../core/security/jwt.security.js";
 import { MAX_DEVICE_LIMIT } from "../../shared/constants/api.constants.js";
-import { getChangedFields } from "../../shared/utils/object.utils.js";
+import {
+  getChangedFields,
+  hasChanges,
+} from "../../shared/utils/object.utils.js";
 import generateUUID from "../../shared/utils/uuid.utils.js";
+import SessionMessages from "./session.messages.js";
 import { SessionRepository } from "./session.repository.js";
 
 class SessionService {
   #sessionRepo;
-  constructor(prismaClient) {
-    this.#sessionRepo = new SessionRepository(prismaClient);
+  /**
+   * @param {SessionRepository} sessionRepo
+   */
+  constructor(sessionRepo) {
+    this.#sessionRepo = sessionRepo;
   }
 
   async getSessionById(id) {
     const session = await this.#sessionRepo.findById(id);
 
     if (!session) {
-      throw ApiError.notFound("Session not found. Please try again later.");
+      throw ApiError.notFound(SessionMessages.Errors.NOT_FOUND);
     }
 
     return session;
-  }
-
-  async findSessionById(id) {
-    return await this.#sessionRepo.findById(id);
   }
 
   async getSessionsByUserId(userId) {
     const sessions = await this.#sessionRepo.findByUserId(userId);
 
     if (!sessions || sessions.length === 0) {
-      throw ApiError.notFound(
-        "Sessions not found for this user. Please try again later."
-      );
+      throw ApiError.notFound(SessionMessages.Errors.NOT_FOUND);
     }
 
     return sessions;
   }
 
-  async findSessionsByUserId(userId) {
-    return await this.#sessionRepo.findByUserId(userId);
-  }
+  async createSessionByUserId(userId, data) {
+    const existingSessions = await this.#sessionRepo.findByUserId(userId);
 
-  async createSession(userId, data) {
-    const existingSessions = await this.findSessionsByUserId(userId);
-
-    if (existingSessions && existingSessions.length >= MAX_DEVICE_LIMIT) {
-      throw ApiError.badRequest(
-        "Maximum session limit reached. Please log out from other devices or contact support."
-      );
+    if (existingSessions.length >= MAX_DEVICE_LIMIT) {
+      throw ApiError.forbidden(SessionMessages.Errors.MAX_DEVICE_LIMIT_REACHED);
     }
 
     const sessionId = generateUUID();
@@ -55,44 +50,102 @@ class SessionService {
     const {
       accessToken,
       refreshToken,
+      refreshTokenExpiryAt,
       hashedRefreshToken,
-      refreshTokenExpiresAt,
-    } = generateAuthTokens({ id: userId, sessionId, tokenVersion: 0 });
+    } = generateAuthTokens({
+      id: userId,
+      sessionId,
+      tokenVersion: 0,
+    });
 
-    const sessionData = {
+    const payload = {
       id: sessionId,
-      ...data,
       refreshToken: hashedRefreshToken,
-      refreshTokenExpiresAt,
+      refreshTokenExpiryAt,
+      ...data,
     };
 
-    const session = await this.#sessionRepo.create(userId, sessionData);
+    const session = await this.#sessionRepo.create(userId, payload);
 
-    return { session, accessToken, refreshToken };
-  }
-
-  async updateSession(id, data) {
-    const existingSession = await this.getSessionById(id);
-
-    const hasUpdates = getChangedFields(existingSession, data);
-    return await this.#sessionRepo.update(id, hasUpdates);
-  }
-
-  async deleteSession(userId, sessionId) {
-    const existingSession = await this.getSessionById(sessionId);
-
-    if (!existingSession || existingSession.userId !== userId) {
-      throw ApiError.notFound(
-        "Session not found for this user. Please try again later."
-      );
+    if (!session) {
+      throw ApiError.internalServerError(SessionMessages.Errors.CREATE_FAILED);
     }
 
-    return await this.#sessionRepo.delete(sessionId);
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async updateSessionById(id, data) {
+    const existingSession = await this.getSessionById(id);
+
+    const changedFields = getChangedFields(existingSession, data);
+
+    if (!hasChanges(existingSession, data)) {
+      return existingSession;
+    }
+
+    const {
+      accessToken,
+      refreshToken,
+      refreshTokenExpiryAt,
+      hashedRefreshToken,
+    } = generateAuthTokens({
+      id: existingSession.userId,
+      sessionId: existingSession.id,
+      tokenVersion: existingSession.tokenVersion + 1,
+    });
+
+    const payload = {
+      ...changedFields,
+      tokenVersion: existingSession.tokenVersion + 1,
+      refreshToken: hashedRefreshToken,
+      refreshTokenExpiryAt,
+    };
+
+    const session = await this.#sessionRepo.update(id, payload);
+
+    if (!session) {
+      throw ApiError.internalServerError(SessionMessages.Errors.UPDATE_FAILED);
+    }
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async deleteSessionById(userId, id) {
+    const existingSession = await this.getSessionById(id);
+
+    if (existingSession.userId !== userId) {
+      throw ApiError.forbidden(SessionMessages.Errors.FORBIDDEN);
+    }
+
+    const session = await this.#sessionRepo.delete(id);
+
+    if (!session) {
+      throw ApiError.internalServerError(SessionMessages.Errors.DELETE_FAILED);
+    }
+
+    return session;
   }
 
   async deleteSessionsByUserId(userId) {
-    await this.getSessionsByUserId(userId);
-    return await this.#sessionRepo.deleteByUserId(userId);
+    const sessions = await this.getSessionsByUserId(userId);
+
+    if (!sessions || sessions.length === 0) {
+      throw ApiError.notFound(SessionMessages.Errors.NOT_FOUND);
+    }
+
+    const deletedSessions = await this.#sessionRepo.deleteByUserId(userId);
+
+    if (!deletedSessions) {
+      throw ApiError.internalServerError(SessionMessages.Errors.DELETE_FAILED);
+    }
+
+    return deletedSessions;
   }
 }
 

@@ -1,11 +1,15 @@
 const SessionSelect = {
   id: true,
   userId: true,
+
   refreshToken: true,
-  refreshTokenExpiresAt: true,
-  tokenVersion: true,
+  refreshTokenExipryAt: true,
+
   ipAddress: true,
   userAgent: true,
+
+  revokedAt: true,
+  replacedBy: true,
 };
 
-export default SessionSelect;
+export { SessionSelect };

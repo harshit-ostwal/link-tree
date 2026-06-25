@@ -1,9 +1,12 @@
-import prisma from "../../infrastructure/database/prisma.js";
-import SessionSelect from "./session.select.js";
+import { PrismaClient } from "../../infrastructure/database/generated/prisma/index.js";
+import { SessionSelect } from "./session.select.js";
 
 class SessionRepository {
   #prisma;
-  constructor(prismaClient = prisma) {
+  /**
+   * @param {PrismaClient} prismaClient
+   */
+  constructor(prismaClient) {
     this.#prisma = prismaClient;
   }
 
@@ -63,6 +66,7 @@ class SessionRepository {
       where: {
         userId,
       },
+      limit: 5,
     });
   }
 }
