@@ -2,11 +2,12 @@ import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
 import { SessionDto } from "./session.dto.js";
 import SessionMessages from "./session.messages.js";
+import { SessionService } from "./session.service.js";
 
 class SessionController {
   #sessionService;
-  constructor(sessionService) {
-    this.#sessionService = sessionService;
+  constructor() {
+    this.#sessionService = new SessionService();
   }
 
   getSessionById = asyncHandler(async (req, res) => {
@@ -86,4 +87,4 @@ class SessionController {
   });
 }
 
-export { SessionController };
+export default new SessionController();
