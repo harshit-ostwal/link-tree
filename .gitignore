@@ -39,3 +39,6 @@ src/infrastructure/database/generated/
 # IDE
 .idea/
 .vscode/
+
+# Excalidraw
+*.excalidraw
