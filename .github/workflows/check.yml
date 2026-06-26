@@ -84,7 +84,7 @@ jobs:
 
       - name: Verify Env
         run: |
-            test -f .env && echo ".env created successfully"
+          test -f .env && echo ".env created successfully"
 
       - name: Prisma Generate
         run: bunx prisma generate
@@ -92,7 +92,7 @@ jobs:
       - name: Start Server in Background
         run: |
           # start the server in background and redirect logs to server.log
-          nohup bun start > server.log 2>&1 &
+          nohup bun dev > server.log 2>&1 &
 
           # Print a quick message and show the last few lines to help debugging
           echo "Server started in background (check server.log)."
@@ -128,3 +128,8 @@ jobs:
         run: |
           echo "Final health-check..."
           curl -f http://localhost:${PORT}/api/v1/health
+
+      - name: Call Health Check DB API (final verify)
+        run: |
+          echo "Final health-check for DB..."
+          curl -f http://localhost:${PORT}/api/v1/health/db
