@@ -1,14 +1,11 @@
-import { PrismaClient } from "../../infrastructure/database/generated/prisma/index.js";
+import prisma from "../../infrastructure/database/prisma.js";
 import generateUUID from "../../shared/utils/uuid.utils.js";
 import AccountSelect from "./account.select.js";
 
 class AccountRepository {
   #prisma;
-  /**
-   * @param {PrismaClient} prisma
-   */
-  constructor(prisma) {
-    this.#prisma = prisma;
+  constructor(prismaClient = prisma) {
+    this.#prisma = prismaClient;
   }
 
   async findById(id) {

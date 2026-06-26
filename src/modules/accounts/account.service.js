@@ -9,11 +9,8 @@ import { AccountRepository } from "./account.repository.js";
 
 class AccountService {
   #accountRepo;
-  /**
-   * @param {AccountRepository} accountRepo
-   */
-  constructor(accountRepo) {
-    this.#accountRepo = accountRepo;
+  constructor(prismaClient) {
+    this.#accountRepo = new AccountRepository(prismaClient);
   }
 
   async getAccountById(id) {
