@@ -18,15 +18,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-
-      - name: Enable Corepack & Install
-        run: |
-          corepack enable
-          bun install --frozen-lockfile
 
       - name: Check Formatting
         run: bunx biome check --write
@@ -91,10 +85,8 @@ jobs:
 
       - name: Start Server in Background
         run: |
-          # start the server in background and redirect logs to server.log
           nohup bun dev > server.log 2>&1 &
 
-          # Print a quick message and show the last few lines to help debugging
           echo "Server started in background (check server.log)."
           sleep 1
           tail -n 20 server.log || true
