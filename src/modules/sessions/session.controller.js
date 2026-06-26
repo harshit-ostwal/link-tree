@@ -2,13 +2,9 @@ import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
 import { SessionDto } from "./session.dto.js";
 import SessionMessages from "./session.messages.js";
-import { SessionService } from "./session.service.js";
 
 class SessionController {
   #sessionService;
-  /**
-   * @param {SessionService} sessionService
-   */
   constructor(sessionService) {
     this.#sessionService = sessionService;
   }

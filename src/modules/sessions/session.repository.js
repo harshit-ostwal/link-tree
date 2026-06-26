@@ -1,12 +1,9 @@
-import { PrismaClient } from "../../infrastructure/database/generated/prisma/index.js";
+import prisma from "../../infrastructure/database/prisma.js";
 import { SessionSelect } from "./session.select.js";
 
 class SessionRepository {
   #prisma;
-  /**
-   * @param {PrismaClient} prismaClient
-   */
-  constructor(prismaClient) {
+  constructor(prismaClient = prisma) {
     this.#prisma = prismaClient;
   }
 

@@ -11,11 +11,8 @@ import { SessionRepository } from "./session.repository.js";
 
 class SessionService {
   #sessionRepo;
-  /**
-   * @param {SessionRepository} sessionRepo
-   */
-  constructor(sessionRepo) {
-    this.#sessionRepo = sessionRepo;
+  constructor(prismaClient) {
+    this.#sessionRepo = new SessionRepository(prismaClient);
   }
 
   async getSessionById(id) {
