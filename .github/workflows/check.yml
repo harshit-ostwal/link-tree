@@ -12,6 +12,7 @@ on:
 jobs:
   lint-and-build:
     runs-on: ubuntu-latest
+    environment: development
     env:
       NODE_ENV: ${{ vars.NODE_ENV }}
       DOTENV_DEBUG: ${{ vars.DOTENV_DEBUG }}
@@ -63,6 +64,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: lint-and-build
+    environment: development
     env:
       NODE_ENV: ${{ vars.NODE_ENV }}
       DOTENV_DEBUG: ${{ vars.DOTENV_DEBUG }}
