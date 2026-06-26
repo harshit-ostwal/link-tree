@@ -3,6 +3,12 @@ const UserMessages = {
     NOT_FOUND: "Unable to find the requested user.",
     ALREADY_EXISTS: "A user with the provided details already exists.",
 
+    INVALID_USERNAME_GENERATION:
+      "Unable to generate a valid username from the provided names.",
+
+    INVALID_USERNAME:
+      "The provided username is invalid. Please choose a different username.",
+
     ACCOUNT_SUSPENDED:
       "Your account has been suspended. Please contact support for assistance.",
     ACCOUNT_DELETED:

@@ -1,11 +1,11 @@
 import { UserStatus } from "../../infrastructure/database/generated/prisma/index.js";
-import prisma from "../../infrastructure/database/prisma.js";
+import prismaService from "../../infrastructure/database/prisma.service.js";
 import generateUUID from "../../shared/utils/uuid.utils.js";
 import UserSelect from "./user.select.js";
 
 class UserRepository {
   #prisma;
-  constructor(prismaClient = prisma) {
+  constructor(prismaClient = prismaService.getClient()) {
     this.#prisma = prismaClient;
   }
 

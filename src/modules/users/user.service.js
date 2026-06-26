@@ -3,6 +3,7 @@ import {
   getChangedFields,
   hasChanges,
 } from "../../shared/utils/object.utils.js";
+import { generateUsername } from "../../shared/utils/username.utils.js";
 import UserMessages from "./user.messages.js";
 import { UserRepository } from "./user.repository.js";
 
@@ -20,6 +21,10 @@ class UserService {
     }
 
     return users;
+  }
+
+  async findUserById(id) {
+    return await this.#userRepo.findById(id);
   }
 
   async getUserById(id) {
@@ -40,6 +45,14 @@ class UserService {
     }
 
     return user;
+  }
+
+  async findUserByEmail(email) {
+    return await this.#userRepo.findByEmail(email);
+  }
+
+  async findUserByUsername(username) {
+    return await this.#userRepo.findByUsername(username);
   }
 
   async getUserByUsername(username) {
@@ -63,6 +76,13 @@ class UserService {
   }
 
   async createUser(data) {
+    if (!data.username) {
+      data.username = await this.generateUniqueUsername(
+        data.firstName,
+        data.lastName,
+      );
+    }
+
     const existingUser = await this.#userRepo.findByEmailOrUsername(
       data.username,
       data.email,
@@ -133,6 +153,29 @@ class UserService {
     }
 
     return user;
+  }
+
+  async generateUniqueUsername(firstName, lastName) {
+    const fullName = `${firstName || ""} ${lastName || ""}`.trim();
+    const baseUsername = generateUsername(fullName);
+
+    if (!baseUsername) {
+      throw ApiError.badRequest(
+        UserMessages.Errors.INVALID_USERNAME_GENERATION,
+      );
+    }
+
+    let username = baseUsername;
+    let counter = 1;
+    let existingUser = await this.#userRepo.findByUsername(username);
+
+    while (existingUser) {
+      username = `${baseUsername}-${counter}`;
+      existingUser = await this.#userRepo.findByUsername(username);
+      counter++;
+    }
+
+    return username;
   }
 }
 
