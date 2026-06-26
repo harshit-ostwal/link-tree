@@ -47,4 +47,6 @@ router.use(
   (await import("../modules/sessions/session.route.js")).sessionRouter,
 );
 
+router.use("/auth", (await import("../modules/auth/auth.route.js")).authRouter);
+
 export default router;

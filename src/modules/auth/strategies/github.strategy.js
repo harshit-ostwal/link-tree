@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GitHubProvider } from "passport-github2";
 import ApiError from "../../../core/http/api.error.js";
 import { AuthProvider } from "../../../infrastructure/database/generated/prisma/index.js";
+import { getRequestInfo } from "../../../shared/utils/request.utils.js";
 import { AuthService } from "../auth.service.js";
 import { oAuthConfig } from "../config/oauth.config.js";
 
@@ -21,6 +22,8 @@ const GitHubStrategy = () => {
             );
           }
 
+          const { ipAddress, userAgent } = getRequestInfo(req);
+
           const data = {
             user: {
               email,
@@ -37,12 +40,8 @@ const GitHubStrategy = () => {
               lastLoginAt: new Date(),
             },
             session: {
-              ipAddress:
-                req.ip ||
-                req.connection.remoteAddress ||
-                req.headers["x-forwarded-for"] ||
-                null,
-              userAgent: req.headers["user-agent"] || null,
+              ipAddress,
+              userAgent,
             },
           };
 

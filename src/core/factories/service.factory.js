@@ -8,6 +8,7 @@ export function createServices(prismaClient) {
   const accountService = new AccountService(prismaClient);
   const profileService = new ProfileService(prismaClient);
   const sessionService = new SessionService(prismaClient);
+  // const verificationService = new VerificationService(prismaClient);
 
   return {
     userService,
