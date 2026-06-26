@@ -18,6 +18,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+          with:
+            node-version: 24
+      - run: npm ci
+      - run: npm test
+
       - name: Use Bun
         uses: oven-sh/setup-bun@v1
         with:
@@ -77,6 +84,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+      uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm test
 
       - name: Use Bun
         uses: oven-sh/setup-bun@v1
