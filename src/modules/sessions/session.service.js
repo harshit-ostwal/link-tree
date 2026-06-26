@@ -15,6 +15,10 @@ class SessionService {
     this.#sessionRepo = new SessionRepository(prismaClient);
   }
 
+  async findSessionById(id) {
+    return await this.#sessionRepo.findById(id);
+  }
+
   async getSessionById(id) {
     const session = await this.#sessionRepo.findById(id);
 

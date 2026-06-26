@@ -7,7 +7,6 @@ services:
     container_name: link-tree-backend-dev
     env_file:
       - .env
-      - .env.development
     ports:
       - "8080:8080"
     volumes:

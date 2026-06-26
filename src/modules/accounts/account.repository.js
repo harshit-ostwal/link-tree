@@ -41,7 +41,7 @@ class AccountRepository {
   async findByUserIdAndProvider(userId, provider) {
     return await this.#prisma.account.findUnique({
       where: {
-        userId_provider: {
+        provider_userId: {
           userId,
           provider,
         },

@@ -18,23 +18,25 @@ class AuthService {
         createServices(prismaClient);
 
       const existingAccount =
-        await accountService.getAccountByProviderAndProviderId(
+        await accountService.findAccountByProviderAndProviderId(
           data.account.provider,
           data.account.providerId,
         );
 
       if (existingAccount) {
-        const existingUser = await userService.getUserById(
+        const existingUser = await userService.findUserById(
           existingAccount.userId,
         );
 
         if (!existingUser) {
-          const userData = {
-            ...data.user,
-            firstName: data.profile.firstName,
-            lastName: data.profile.lastName,
-          };
-          const user = await userService.createUser(userData);
+          const username = await userService.generateUniqueUsername(
+            data.profile.firstName,
+            data.profile.lastName,
+          );
+
+          data.user.username = username;
+
+          const user = await userService.createUser(data.user);
           await accountService.createAccountByUserId(user.id, data.account);
           await profileService.upsertProfileByUserId(user.id, data.profile);
           const { accessToken, refreshToken } =
@@ -47,7 +49,7 @@ class AuthService {
           };
         }
 
-        await userService.updateUserById(existingUser.id, {
+        await accountService.updateAccountById(existingAccount.id, {
           lastLoginAt: new Date(),
         });
 
@@ -69,7 +71,7 @@ class AuthService {
         };
       }
 
-      const existingUser = await userService.getUserByEmail(data.user.email);
+      const existingUser = await userService.findUserByEmail(data.user.email);
 
       if (existingUser) {
         await accountService.createAccountByUserId(
@@ -95,12 +97,14 @@ class AuthService {
         };
       }
 
-      const userData = {
-        ...data.user,
-        firstName: data.profile.firstName,
-        lastName: data.profile.lastName,
-      };
-      const user = await userService.createUser(userData);
+      const username = await userService.generateUniqueUsername(
+        data.profile.firstName,
+        data.profile.lastName,
+      );
+
+      data.user.username = username;
+
+      const user = await userService.createUser(data.user);
       await accountService.createAccountByUserId(user.id, data.account);
       await profileService.upsertProfileByUserId(user.id, data.profile);
       const { accessToken, refreshToken } =
@@ -119,21 +123,25 @@ class AuthService {
       const { userService, profileService, accountService } =
         createServices(prismaClient);
 
-      const existingUser = await userService.getUserByEmail(data.user.email);
+      const existingUser = await userService.findUserByEmail(data.user.email);
+      const existingUserByUsername = await userService.findUserByUsername(
+        data.user.username,
+      );
 
-      if (existingUser) {
+      if (existingUser || existingUserByUsername) {
         throw ApiError.conflict(AuthMessages.Errors.ALREADY_CREDENTIAL_EXISTS);
       }
 
       data.account.provider = AuthProvider.CREDENTIALS;
       data.account.providerId = data.user.email;
 
-      const userData = {
-        ...data.user,
-        firstName: data.profile.firstName,
-        lastName: data.profile.lastName,
-      };
-      const user = await userService.createUser(userData);
+      const username = await userService.generateUniqueUsername(
+        data.profile.firstName,
+        data.profile.lastName,
+      );
+
+      data.user.username = username;
+      const user = await userService.createUser(data.user);
       await profileService.upsertProfileByUserId(user.id, data.profile);
       await accountService.createAccountByUserId(user.id, data.account);
 
@@ -148,19 +156,31 @@ class AuthService {
       const { userService, accountService, sessionService } =
         createServices(prismaClient);
 
-      const existingUser = await userService.getUserByIdentifier(
+      const existingUser = await userService.findUserByIdentifier(
         data.identifier,
       );
+
+      if (!existingUser) {
+        throw ApiError.notFound(AuthMessages.Errors.INVALID_CREDENTIALS);
+      }
 
       if (existingUser.emailVerifiedAt === null) {
         throw ApiError.forbidden(AuthMessages.Errors.EMAIL_NOT_VERIFIED);
       }
 
       const existingAccount =
-        await accountService.getAccountByUserIdAndProvider(
+        await accountService.findAccountByUserIdAndProvider(
           existingUser.id,
           AuthProvider.CREDENTIALS,
         );
+
+      if (existingAccount === null) {
+        throw ApiError.notFound(AuthMessages.Errors.INVALID_OAUTH_PROVIDER);
+      }
+
+      if (existingAccount.provider !== AuthProvider.CREDENTIALS) {
+        throw ApiError.forbidden(AuthMessages.Errors.OAUTH_ACCOUNT_NOT_LINKED);
+      }
 
       const isPasswordValid = await compareHash(
         data.password,

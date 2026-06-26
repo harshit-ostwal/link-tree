@@ -7,7 +7,6 @@ services:
     container_name: link-tree-backend
     env_file:
       - .env
-      - .env.production
     ports:
       - "8080:8080"
     healthcheck:

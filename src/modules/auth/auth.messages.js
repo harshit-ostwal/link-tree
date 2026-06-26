@@ -6,6 +6,10 @@ const AuthMessages = {
       "Email not verified. Please verify your email before signing in.",
     INVALID_CREDENTIALS:
       "Invalid credentials. Please check your email/username and password.",
+    INVALID_OAUTH_PROVIDER:
+      "Invalid OAuth provider. Please use a valid provider to sign in.",
+    OAUTH_ACCOUNT_NOT_LINKED:
+      "OAuth account not linked. Please sign in with your credentials first.",
   },
 
   Responses: {

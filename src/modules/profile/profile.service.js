@@ -21,6 +21,65 @@ class ProfileService {
     return profile;
   }
 
+  // async upsertProfileByUserId(userId, data, files) {
+  //   const existingProfile = await this.#profileRepo.findByUserId(userId);
+
+  //   if (files?.avatar?.[0] && !data.avatar) {
+  //     const avatar = await CloudinaryManager.uploadImage(
+  //       files.avatar[0].path,
+  //       CLOUDINARY_FOLDERS.USER_AVATAR,
+  //     );
+
+  //     if (avatar?.secure_url) {
+  //       data.avatar = avatar.secure_url;
+  //       data.avatarPublicId = avatar.public_id;
+  //     }
+  //   }
+
+  //   if (files?.banner?.[0] && !data.banner) {
+  //     const banner = await CloudinaryManager.uploadImage(
+  //       files.banner[0].path,
+  //       CLOUDINARY_FOLDERS.USER_BANNER,
+  //     );
+
+  //     if (banner?.secure_url) {
+  //       data.banner = banner.secure_url;
+  //       data.bannerPublicId = banner.public_id;
+  //     }
+  //   }
+
+  //   const changedFields = getChangedFields(existingProfile, data);
+
+  //   if (!hasChanges(existingProfile, data)) {
+  //     return existingProfile;
+  //   }
+
+  //   const profile = await this.#profileRepo.upsertByUserId(
+  //     userId,
+  //     changedFields,
+  //   );
+
+  //   if (!profile) {
+  //     if (data.avatarPublicId) {
+  //       await CloudinaryManager.deleteImage(data.avatarPublicId);
+  //     }
+  //     if (data.bannerPublicId) {
+  //       await CloudinaryManager.deleteImage(data.bannerPublicId);
+  //     }
+
+  //     throw ApiError.internalServerError(ProfileMessages.Errors.UPDATE_FAILED);
+  //   }
+
+  //   if (existingProfile?.avatarPublicId && changedFields.avatarPublicId) {
+  //     await CloudinaryManager.deleteImage(existingProfile.avatarPublicId);
+  //   }
+  //   if (existingProfile?.bannerPublicId && changedFields.bannerPublicId) {
+  //     await CloudinaryManager.deleteImage(existingProfile.bannerPublicId);
+  //   }
+
+  //   return profile;
+  // }
+
   async upsertProfileByUserId(userId, data, files) {
     const existingProfile = await this.#profileRepo.findByUserId(userId);
 
@@ -48,9 +107,30 @@ class ProfileService {
       }
     }
 
+    // Create profile if it doesn't exist
+    if (!existingProfile) {
+      const profile = await this.#profileRepo.upsertByUserId(userId, data);
+
+      if (!profile) {
+        if (data.avatarPublicId) {
+          await CloudinaryManager.deleteImage(data.avatarPublicId);
+        }
+
+        if (data.bannerPublicId) {
+          await CloudinaryManager.deleteImage(data.bannerPublicId);
+        }
+
+        throw ApiError.internalServerError(
+          ProfileMessages.Errors.UPDATE_FAILED,
+        );
+      }
+
+      return profile;
+    }
+
     const changedFields = getChangedFields(existingProfile, data);
 
-    if (!hasChanges(existingProfile, data)) {
+    if (Object.keys(changedFields).length === 0) {
       return existingProfile;
     }
 
@@ -63,6 +143,7 @@ class ProfileService {
       if (data.avatarPublicId) {
         await CloudinaryManager.deleteImage(data.avatarPublicId);
       }
+
       if (data.bannerPublicId) {
         await CloudinaryManager.deleteImage(data.bannerPublicId);
       }
@@ -70,10 +151,11 @@ class ProfileService {
       throw ApiError.internalServerError(ProfileMessages.Errors.UPDATE_FAILED);
     }
 
-    if (existingProfile?.avatarPublicId && changedFields.avatarPublicId) {
+    if (existingProfile.avatarPublicId && changedFields.avatarPublicId) {
       await CloudinaryManager.deleteImage(existingProfile.avatarPublicId);
     }
-    if (existingProfile?.bannerPublicId && changedFields.bannerPublicId) {
+
+    if (existingProfile.bannerPublicId && changedFields.bannerPublicId) {
       await CloudinaryManager.deleteImage(existingProfile.bannerPublicId);
     }
 

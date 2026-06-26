@@ -65,6 +65,10 @@ class UserService {
     return user;
   }
 
+  async findUserByIdentifier(identifier) {
+    return await this.#userRepo.findByIdentifier(identifier);
+  }
+
   async getUserByIdentifier(identifier) {
     const user = await this.#userRepo.findByIdentifier(identifier);
 
@@ -76,13 +80,6 @@ class UserService {
   }
 
   async createUser(data) {
-    if (!data.username) {
-      data.username = await this.generateUniqueUsername(
-        data.firstName,
-        data.lastName,
-      );
-    }
-
     const existingUser = await this.#userRepo.findByEmailOrUsername(
       data.username,
       data.email,

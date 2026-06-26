@@ -1,5 +1,10 @@
+import { FRONTEND_URL } from "../../config/env.config.js";
 import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
+import {
+  clearAuthCookies,
+  setAuthCookies,
+} from "../../shared/utils/cookie.utils.js";
 import { getRequestInfo } from "../../shared/utils/request.utils.js";
 import { AuthDto } from "./auth.dto.js";
 import AuthMessages from "./auth.messages.js";

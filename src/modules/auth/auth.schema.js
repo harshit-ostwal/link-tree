@@ -1,16 +1,25 @@
 import z from "zod/v4";
-import { zEmail, zString } from "../../shared/utils/zod.utils.js";
+import { AuthProvider } from "../../infrastructure/database/generated/prisma/index.js";
+import {
+  zEmail,
+  zEnum,
+  zPassword,
+  zString,
+} from "../../shared/utils/zod.utils.js";
 
 const signUpSchema = z
   .strictObject({
     user: z.strictObject({
       email: zEmail(),
       username: zString("Username"),
-      password: zString("Password"),
     }),
     profile: z.strictObject({
       firstName: zString("First Name"),
       lastName: zString("Last Name"),
+    }),
+    account: z.strictObject({
+      provider: zEnum("Provider", AuthProvider),
+      password: zPassword(),
     }),
   })
   .strip();
@@ -18,7 +27,7 @@ const signUpSchema = z
 const signInSchema = z
   .strictObject({
     identifier: zString("Identifier"),
-    password: zString("Password"),
+    password: zPassword(),
   })
   .strip();
 

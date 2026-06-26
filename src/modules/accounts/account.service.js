@@ -17,7 +17,7 @@ class AccountService {
     const account = await this.#accountRepo.findById(id);
 
     if (!account) {
-      throw ApiError(AccountMessages.Errors.NOT_FOUND);
+      throw ApiError.notFound(AccountMessages.Errors.NOT_FOUND);
     }
 
     return account;
@@ -27,7 +27,7 @@ class AccountService {
     const accounts = await this.#accountRepo.findByUserId(userId);
 
     if (!accounts || accounts.length === 0) {
-      throw ApiError(AccountMessages.Errors.NOT_FOUND);
+      throw ApiError.notFound(AccountMessages.Errors.NOT_FOUND);
     }
 
     return accounts;
@@ -40,7 +40,7 @@ class AccountService {
     );
 
     if (!account) {
-      throw ApiError(AccountMessages.Errors.NOT_FOUND);
+      throw ApiError.notFound(AccountMessages.Errors.NOT_FOUND);
     }
 
     return account;
@@ -53,6 +53,10 @@ class AccountService {
     );
   }
 
+  async findAccountByUserIdAndProvider(userId, provider) {
+    return await this.#accountRepo.findByUserIdAndProvider(userId, provider);
+  }
+
   async getAccountByUserIdAndProvider(userId, provider) {
     const account = await this.#accountRepo.findByUserIdAndProvider(
       userId,
@@ -60,7 +64,7 @@ class AccountService {
     );
 
     if (!account) {
-      throw ApiError(AccountMessages.Errors.NOT_FOUND);
+      throw ApiError.notFound(AccountMessages.Errors.NOT_FOUND);
     }
 
     return account;
@@ -73,7 +77,7 @@ class AccountService {
     );
 
     if (existingAccount) {
-      throw ApiError(AccountMessages.Errors.ALREADY_EXISTS);
+      throw ApiError.conflict(AccountMessages.Errors.ALREADY_EXISTS);
     }
 
     if (data.password) {

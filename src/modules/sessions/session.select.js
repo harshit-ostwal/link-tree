@@ -3,7 +3,8 @@ const SessionSelect = {
   userId: true,
 
   refreshToken: true,
-  refreshTokenExipryAt: true,
+  refreshTokenExpiryAt: true,
+  tokenVersion: true,
 
   ipAddress: true,
   userAgent: true,
