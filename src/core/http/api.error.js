@@ -1,4 +1,4 @@
-import { mapPrismaError } from "../../infrastructure/database/prisma.error.js";
+// import { mapPrismaError } from "../../infrastructure/database/prisma.error.js";
 import {
   HTTP_MESSAGES,
   HTTP_STATUS,
@@ -47,10 +47,10 @@ class ApiError extends Error {
   static from(error, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR) {
     if (!error) return new ApiError(statusCode);
 
-    const prismaError = mapPrismaError(error);
-    if (prismaError) {
-      return prismaError;
-    }
+    // const prismaError = mapPrismaError(error);
+    // if (prismaError) {
+    //   return prismaError;
+    // }
 
     if (error instanceof ApiError) return error;
 
