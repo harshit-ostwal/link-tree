@@ -39,12 +39,12 @@ router.use(
 
 router.use(
   "/accounts",
-  (await import("../modules/accounts/account.route.js")).default,
+  (await import("../modules/accounts/account.route.js")).accountRouter,
 );
 
 router.use(
   "/sessions",
-  (await import("../modules/sessions/session.route.js")).default,
+  (await import("../modules/sessions/session.route.js")).sessionRouter,
 );
 
 export default router;
