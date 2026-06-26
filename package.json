@@ -23,27 +23,30 @@
     "dev:nodemon": "cross-env NODE_ENV=development nodemon src/index.js",
     "dev": "cross-env NODE_ENV=development bun --hot src/index.js",
     "start": "cross-env NODE_ENV=production bun src/index.js",
-    "start:prod": "cross-env NODE_ENV=production prisma migrate deploy && cross-env NODE_ENV=production bun src/index.js",
     "biome": "bun biome:clean && bun biome:format && bun biome:check && bun biome:lint",
     "biome:format": "bunx biome format --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
     "biome:lint": "bunx biome lint --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
-    "biome:check": "bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
+    "biome:check": "bunx biome check . --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
     "biome:clean": "bunx biome clean",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name",
+    "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:migrate:reset": "prisma migrate reset",
     "prisma:migrate:status": "prisma migrate status",
     "prisma:studio": "prisma studio",
     "prisma:db:push": "prisma db push",
     "prisma:db:pull": "prisma db pull",
+    "docker:build:dev": "docker compose -f docker-compose.development.yml build",
+    "docker:run:dev": "docker compose -f docker-compose.development.yml up --build",
+    "docker:stop:dev": "docker compose -f docker-compose.development.yml down",
+    "docker:build:prod": "docker compose -f docker-compose.production.yml build",
+    "docker:run:prod": "docker compose -f docker-compose.production.yml up --build -d",
+    "docker:stop:prod": "docker compose -f docker-compose.production.yml down",
     "prepare": "husky"
   },
   "lint-staged": {
     "*": [
-      "bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true",
-      "bunx biome format --write --no-errors-on-unmatched --files-ignore-unknown=true",
-      "bunx biome lint --write --no-errors-on-unmatched --files-ignore-unknown=true"
+      "bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
     ]
   },
   "dependencies": {
@@ -63,7 +66,6 @@
     "multer": "^2.1.1",
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.11",
-    "nodemon": "^3.1.14",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
@@ -80,6 +82,7 @@
     "cross-env": "^10.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.5",
-    "prisma": "^7.8.0"
+    "prisma": "^7.8.0",
+    "nodemon": "^3.1.14"
   }
 }
