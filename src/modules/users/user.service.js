@@ -8,9 +8,6 @@ import { UserRepository } from "./user.repository.js";
 
 class UserService {
   #userRepo;
-  /**
-   * @param {PrismaClient} [prismaClient]
-   */
   constructor(prismaClient) {
     this.#userRepo = new UserRepository(prismaClient);
   }

@@ -2,11 +2,12 @@ import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
 import UserDto from "./user.dto.js";
 import UserMessages from "./user.messages.js";
+import { UserService } from "./user.service.js";
 
 class UserController {
   #userService;
-  constructor(userService) {
-    this.#userService = userService;
+  constructor() {
+    this.#userService = new UserService();
   }
 
   getAllUsers = asyncHandler(async (_req, res) => {
@@ -108,4 +109,4 @@ class UserController {
   });
 }
 
-export { UserController };
+export default new UserController();

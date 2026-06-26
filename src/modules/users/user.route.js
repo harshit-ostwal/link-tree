@@ -3,7 +3,7 @@ import validate from "../../core/middlewares/validate.middleware.js";
 import ValidationSource from "../../shared/constants/validation.constants.js";
 import { idParamSchema } from "../../shared/schemas/uuid.schema.js";
 import { requireSelfOrAdmin } from "./user.authoriztion.js";
-import { userController } from "./user.container.js";
+import userController from "./user.controller.js";
 import {
   createUserSchema,
   emailParamSchema,
