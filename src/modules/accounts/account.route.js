@@ -16,7 +16,7 @@ const router = createRouter();
 
 router
   .route("/")
-  .post(validate(createAccountSchema), accountController.createAccount)
+  .post(validate(createAccountSchema), accountController.createAccountByUserId)
   .get(accountController.getAccountsByUserId)
   .delete(accountController.deleteAccountsByUserId);
 
