@@ -1,5 +1,6 @@
 import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
+import { getRequestInfo } from "../../shared/utils/request.utils.js";
 import { SessionDto } from "./session.dto.js";
 import SessionMessages from "./session.messages.js";
 import { SessionService } from "./session.service.js";
@@ -36,9 +37,10 @@ class SessionController {
     const userId = req.user.id;
     const data = req.body;
 
-    data.ipAddress =
-      req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-    data.userAgent = req.headers["user-agent"] || "Unknown";
+    const { ipAddress, userAgent } = getRequestInfo(req);
+
+    data.ipAddress = ipAddress;
+    data.userAgent = userAgent;
 
     const session = await this.#sessionService.createSessionByUserId(
       userId,
@@ -55,9 +57,9 @@ class SessionController {
     const id = req.params.id;
     const data = req.body;
 
-    data.ipAddress =
-      req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-    data.userAgent = req.headers["user-agent"] || "Unknown";
+    const { ipAddress, userAgent } = getRequestInfo(req);
+    data.ipAddress = ipAddress;
+    data.userAgent = userAgent;
 
     const session = await this.#sessionService.updateSessionById(id, data);
 
