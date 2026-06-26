@@ -2,11 +2,12 @@ import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
 import { ProfileDto } from "./profile.dto.js";
 import ProfileMessages from "./profile.messages.js";
+import { ProfileService } from "./profile.service.js";
 
 class ProfileController {
   #profileService;
-  constructor(profileService) {
-    this.#profileService = profileService;
+  constructor() {
+    this.#profileService = new ProfileService();
   }
 
   getProfileByUserId = asyncHandler(async (req, res) => {
@@ -49,4 +50,4 @@ class ProfileController {
   });
 }
 
-export { ProfileController };
+export default new ProfileController();
