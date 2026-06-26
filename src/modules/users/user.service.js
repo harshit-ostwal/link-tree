@@ -1,15 +1,18 @@
 import ApiError from "../../core/http/api.error.js";
-import { getChangedFields } from "../../shared/utils/object.utils.js";
+import {
+  getChangedFields,
+  hasChanges,
+} from "../../shared/utils/object.utils.js";
 import UserMessages from "./user.messages.js";
 import { UserRepository } from "./user.repository.js";
 
 class UserService {
   #userRepo;
   /**
-   * @param {UserRepository} userRepository
+   * @param {PrismaClient} [prismaClient]
    */
-  constructor(userRepository) {
-    this.#userRepo = userRepository;
+  constructor(prismaClient) {
+    this.#userRepo = new UserRepository(prismaClient);
   }
 
   async getAllUsers() {

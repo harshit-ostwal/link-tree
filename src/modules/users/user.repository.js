@@ -1,16 +1,11 @@
-import {
-  PrismaClient,
-  UserStatus,
-} from "../../infrastructure/database/generated/prisma/index.js";
+import { UserStatus } from "../../infrastructure/database/generated/prisma/index.js";
+import prisma from "../../infrastructure/database/prisma.js";
 import generateUUID from "../../shared/utils/uuid.utils.js";
 import UserSelect from "./user.select.js";
 
 class UserRepository {
   #prisma;
-  /**
-   * @param {PrismaClient} prismaClient
-   */
-  constructor(prismaClient) {
+  constructor(prismaClient = prisma) {
     this.#prisma = prismaClient;
   }
 
@@ -78,6 +73,7 @@ class UserRepository {
             username,
           },
         ],
+        status: UserStatus.ACTIVE,
       },
       select: UserSelect,
     });
@@ -98,6 +94,7 @@ class UserRepository {
     return await this.#prisma.user.update({
       where: {
         id,
+        status: UserStatus.ACTIVE,
       },
       data,
       select: UserSelect,
@@ -108,6 +105,7 @@ class UserRepository {
     return await this.#prisma.user.update({
       where: {
         id,
+        status: UserStatus.ACTIVE,
       },
       data: {
         deletedAt: new Date(),
@@ -121,6 +119,7 @@ class UserRepository {
     return await this.#prisma.user.delete({
       where: {
         id,
+        status: UserStatus.ACTIVE,
       },
       select: UserSelect,
     });
