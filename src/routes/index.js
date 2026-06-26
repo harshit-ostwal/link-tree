@@ -16,7 +16,7 @@ router.use("/docs", swaggerUi.serve, swaggerUi.setup(specs, theme));
  */
 router.get("/", (_, res) => {
   return ApiResponse.ok(null, `Welcome to the ${APP_NAME} API Service`).send(
-    res
+    res,
   );
 });
 
@@ -29,24 +29,22 @@ router.use("/health", healthRoute);
 
 router.use(
   "/users",
-  (await import("../modules/users/user.route.js")).userRouter
+  (await import("../modules/users/user.route.js")).userRouter,
 );
-
-router.use("/auth", (await import("../modules/auth/auth.route.js")).default);
 
 router.use(
   "/profile",
-  (await import("../modules/profile/profile.route.js")).profileRouter
+  (await import("../modules/profile/profile.route.js")).profileRouter,
 );
 
 router.use(
   "/accounts",
-  (await import("../modules/accounts/account.route.js")).default
+  (await import("../modules/accounts/account.route.js")).default,
 );
 
 router.use(
   "/sessions",
-  (await import("../modules/sessions/session.route.js")).default
+  (await import("../modules/sessions/session.route.js")).default,
 );
 
 export default router;
