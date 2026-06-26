@@ -46,7 +46,9 @@
   },
   "lint-staged": {
     "*": [
-      "bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
+      "bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
+      "bunx biome format --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
+      "bunx biome lint --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none"
     ]
   },
   "dependencies": {
