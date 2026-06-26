@@ -5,12 +5,13 @@ import {
   idParamSchema,
   userIdParamSchema,
 } from "../../shared/schemas/uuid.schema.js";
+import accountController from "./account.controller.js";
 import {
   createAccountSchema,
   providerIdParams,
   providerParams,
+  updateAccountSchema,
 } from "./account.schema.js";
-import { accountController } from "./accounts.container.js";
 
 const router = createRouter();
 
@@ -38,7 +39,7 @@ router
   .route("/:id")
   .all(validate(idParamSchema, ValidationSource.PARAMS))
   .get(accountController.getAccountById)
-  .patch(accountController.updateAccountById)
+  .patch(validate(updateAccountSchema), accountController.updateAccountById)
   .delete(accountController.deleteAccountById);
 
 export { router as accountRouter };

@@ -2,11 +2,12 @@ import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
 import { AccountDto } from "./account.dto.js";
 import AccountMessages from "./account.messages.js";
+import { AccountService } from "./account.service.js";
 
 class AccountController {
   #accountService;
-  constructor(accountService) {
-    this.#accountService = accountService;
+  constructor() {
+    this.#accountService = new AccountService();
   }
 
   getAccountById = asyncHandler(async (req, res) => {
@@ -112,4 +113,4 @@ class AccountController {
   });
 }
 
-export { AccountController };
+export default new AccountController();
