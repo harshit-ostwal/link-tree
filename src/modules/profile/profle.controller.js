@@ -2,13 +2,9 @@ import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
 import { ProfileDto } from "./profile.dto.js";
 import ProfileMessages from "./profile.messages.js";
-import { ProfileService } from "./profile.service.js";
 
 class ProfileController {
   #profileService;
-  /**
-   * @param {ProfileService} profileService
-   */
   constructor(profileService) {
     this.#profileService = profileService;
   }

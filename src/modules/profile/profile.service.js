@@ -7,11 +7,8 @@ import { ProfileRepository } from "./profile.repository.js";
 
 class ProfileService {
   #profileRepo;
-  /**
-   * @param {ProfileRepository} profileRepository
-   */
-  constructor(profileRepository) {
-    this.#profileRepo = profileRepository;
+  constructor(prismaClient) {
+    this.#profileRepo = new ProfileRepository(prismaClient);
   }
 
   async getProfileByUserId(userId) {
