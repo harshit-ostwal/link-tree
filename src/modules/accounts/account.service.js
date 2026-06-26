@@ -46,6 +46,13 @@ class AccountService {
     return account;
   }
 
+  async findAccountByProviderAndProviderId(provider, providerId) {
+    return await this.#accountRepo.findByProviderAndProviderId(
+      provider,
+      providerId,
+    );
+  }
+
   async getAccountByUserIdAndProvider(userId, provider) {
     const account = await this.#accountRepo.findByUserIdAndProvider(
       userId,

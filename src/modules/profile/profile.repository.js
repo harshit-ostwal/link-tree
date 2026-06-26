@@ -1,9 +1,9 @@
-import prisma from "../../infrastructure/database/prisma.js";
+import prismaService from "../../infrastructure/database/prisma.service.js";
 import ProfileSelect from "./profile.select.js";
 
 class ProfileRepository {
   #prisma;
-  constructor(prismaClient = prisma) {
+  constructor(prismaClient = prismaService.getClient()) {
     this.#prisma = prismaClient;
   }
 
