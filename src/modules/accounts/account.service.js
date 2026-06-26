@@ -1,6 +1,9 @@
 import ApiError from "../../core/http/api.error.js";
 import { hashValue } from "../../core/security/hash.security.js";
-import { getChangedFields, hasChanges } from "../../shared/utils/object.utils";
+import {
+  getChangedFields,
+  hasChanges,
+} from "../../shared/utils/object.utils.js";
 import AccountMessages from "./account.messages.js";
 import { AccountRepository } from "./account.repository.js";
 
