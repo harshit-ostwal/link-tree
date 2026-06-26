@@ -42,29 +42,37 @@ jobs:
     needs: lint-and-build
     environment: development
     env:
-      NODE_ENV=${{ vars.NODE_ENV }}
-      DOTENV_DEBUG=${{ vars.DOTENV_DEBUG }}
-      LOG_LEVEL=${{ vars.LOG_LEVEL }}
-      PORT=${{ vars.PORT }}
-      ALLOWED_ORIGINS=${{ vars.ALLOWED_ORIGINS }}
-      BACKEND_URL=${{ vars.BACKEND_URL }}
-      FRONTEND_URL=${{ vars.FRONTEND_URL }}
-      DATABASE_URL=${{ secrets.DATABASE_URL }}
-      CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
-      CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
-      CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
-      GOOGLE_CLIENT_ID=${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }}
-      GOOGLE_CALLBACK_URL=${{ vars.OAUTH_GOOGLE_CALLBACK_URL }}
-      GITHUB_CLIENT_ID=${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
-      GITHUB_CLIENT_SECRET=${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
-      GITHUB_CALLBACK_URL=${{ vars.OAUTH_GITHUB_CALLBACK_URL }}
-      COOKIE_SECRET_KEY=${{ secrets.COOKIE_SECRET_KEY }}
-      ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}
-      ACCESS_TOKEN_EXPIRY=${{ vars.ACCESS_TOKEN_EXPIRY }}
-      REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}
-      REFRESH_TOKEN_EXPIRY=${{ vars.REFRESH_TOKEN_EXPIRY }}
-      REFRESH_TOKEN_EXPIRY_MS=${{ vars.REFRESH_TOKEN_EXPIRY_MS }}
+      NODE_ENV: ${{ vars.NODE_ENV }}
+      DOTENV_DEBUG: ${{ vars.DOTENV_DEBUG }}
+      LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+      PORT: ${{ vars.PORT }}
+    
+      ALLOWED_ORIGINS: ${{ vars.ALLOWED_ORIGINS }}
+      BACKEND_URL: ${{ vars.BACKEND_URL }}
+      FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+    
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    
+      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+    
+      GOOGLE_CLIENT_ID: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }}
+      GOOGLE_CALLBACK_URL: ${{ vars.OAUTH_GOOGLE_CALLBACK_URL }}
+    
+      GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+      GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
+      GITHUB_CALLBACK_URL: ${{ vars.OAUTH_GITHUB_CALLBACK_URL }}
+    
+      COOKIE_SECRET_KEY: ${{ secrets.COOKIE_SECRET_KEY }}
+    
+      ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+      ACCESS_TOKEN_EXPIRY: ${{ vars.ACCESS_TOKEN_EXPIRY }}
+    
+      REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+      REFRESH_TOKEN_EXPIRY: ${{ vars.REFRESH_TOKEN_EXPIRY }}
+      REFRESH_TOKEN_EXPIRY_MS: ${{ vars.REFRESH_TOKEN_EXPIRY_MS }}
 
     steps:
       - name: Checkout
@@ -146,10 +154,9 @@ jobs:
 
       - name: Call Health Check API (final verify)
         run: |
-          echo "Final health-check..."
-          curl -f http://localhost:${PORT}/api/v1/health
+          echo "PORT=$PORT"
+          curl -f http://localhost:${PORT:-8080}/api/v1/health
 
       - name: Call Health Check DB API (final verify)
         run: |
-          echo "Final health-check for DB..."
-          curl -f http://localhost:${PORT}/api/v1/health/db
+          curl -f http://localhost:${PORT:-8080}/api/v1/health/db
