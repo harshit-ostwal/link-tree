@@ -24,48 +24,58 @@ class ProfileService {
   async upsertProfileByUserId(userId, data, files) {
     const existingProfile = await this.#profileRepo.findByUserId(userId);
 
-    if (files?.avatar?.[0] && !data.avatar) {
-      const avatar = await CloudinaryManager.uploadImage(
-        files.avatar[0].path,
-        CLOUDINARY_FOLDERS.USER_AVATAR,
-      );
+    if (files?.avatar?.[0]) {
+      if (existingProfile?.avatarPublicId) {
+        const avatar = await CloudinaryManager.updateImage(
+          existingProfile.avatarPublicId,
+          files.avatar[0].path,
+          CLOUDINARY_FOLDERS.USER_AVATAR,
+        );
 
-      if (avatar?.secure_url) {
-        data.avatar = avatar.secure_url;
-        data.avatarPublicId = avatar.public_id;
+        if (avatar?.secure_url) {
+          data.avatar = avatar.secure_url;
+          data.avatarPublicId = avatar.public_id;
+        }
+      } else {
+        const avatar = await CloudinaryManager.uploadImage(
+          files.avatar[0].path,
+          CLOUDINARY_FOLDERS.USER_AVATAR,
+        );
+
+        if (avatar?.secure_url) {
+          data.avatar = avatar.secure_url;
+          data.avatarPublicId = avatar.public_id;
+        }
       }
     }
 
-    if (files?.banner?.[0] && !data.banner) {
-      const banner = await CloudinaryManager.uploadImage(
-        files.banner[0].path,
-        CLOUDINARY_FOLDERS.USER_BANNER,
-      );
+    if (files?.banner?.[0]) {
+      if (existingProfile?.bannerPublicId) {
+        const banner = await CloudinaryManager.updateImage(
+          existingProfile.bannerPublicId,
+          files.banner[0].path,
+          CLOUDINARY_FOLDERS.USER_BANNER,
+        );
 
-      if (banner?.secure_url) {
-        data.banner = banner.secure_url;
-        data.bannerPublicId = banner.public_id;
+        if (banner?.secure_url) {
+          data.banner = banner.secure_url;
+          data.bannerPublicId = banner.public_id;
+        }
+      } else {
+        const banner = await CloudinaryManager.uploadImage(
+          files.banner[0].path,
+          CLOUDINARY_FOLDERS.USER_BANNER,
+        );
+
+        if (banner?.secure_url) {
+          data.banner = banner.secure_url;
+          data.bannerPublicId = banner.public_id;
+        }
       }
     }
 
-    // Create profile if it doesn't exist
     if (!existingProfile) {
       const profile = await this.#profileRepo.upsertByUserId(userId, data);
-
-      if (!profile) {
-        if (data.avatarPublicId) {
-          await CloudinaryManager.deleteImage(data.avatarPublicId);
-        }
-
-        if (data.bannerPublicId) {
-          await CloudinaryManager.deleteImage(data.bannerPublicId);
-        }
-
-        throw ApiError.internalServerError(
-          ProfileMessages.Errors.UPDATE_FAILED,
-        );
-      }
-
       return profile;
     }
 
@@ -80,24 +90,17 @@ class ProfileService {
       changedFields,
     );
 
-    if (!profile) {
-      if (data.avatarPublicId) {
-        await CloudinaryManager.deleteImage(data.avatarPublicId);
-      }
-
-      if (data.bannerPublicId) {
-        await CloudinaryManager.deleteImage(data.bannerPublicId);
-      }
-
-      throw ApiError.internalServerError(ProfileMessages.Errors.UPDATE_FAILED);
-    }
-
+    const publicIdsToDelete = [];
     if (existingProfile.avatarPublicId && changedFields.avatarPublicId) {
-      await CloudinaryManager.deleteImage(existingProfile.avatarPublicId);
+      publicIdsToDelete.push(existingProfile.avatarPublicId);
     }
 
     if (existingProfile.bannerPublicId && changedFields.bannerPublicId) {
-      await CloudinaryManager.deleteImage(existingProfile.bannerPublicId);
+      publicIdsToDelete.push(existingProfile.bannerPublicId);
+    }
+
+    if (publicIdsToDelete.length > 0) {
+      await CloudinaryManager.deleteImages(publicIdsToDelete);
     }
 
     return profile;
@@ -106,12 +109,17 @@ class ProfileService {
   async deleteProfileByUserId(userId) {
     const existingProfile = await this.getProfileByUserId(userId);
 
+    const publicIdsToDelete = [];
     if (existingProfile.avatarPublicId) {
-      await CloudinaryManager.deleteImage(existingProfile.avatarPublicId);
+      publicIdsToDelete.push(existingProfile.avatarPublicId);
     }
 
     if (existingProfile.bannerPublicId) {
-      await CloudinaryManager.deleteImage(existingProfile.bannerPublicId);
+      publicIdsToDelete.push(existingProfile.bannerPublicId);
+    }
+
+    if (publicIdsToDelete.length > 0) {
+      await CloudinaryManager.deleteImages(publicIdsToDelete);
     }
 
     const profile = await this.#profileRepo.deleteByUserId(userId);

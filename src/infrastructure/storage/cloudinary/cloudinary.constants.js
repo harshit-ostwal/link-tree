@@ -4,7 +4,7 @@ const RESOURCE_TYPE = "image";
 const ACCESS_MODE = "public";
 const CHUNK_SIZE = 6000000;
 const TYPE = "upload";
-const FOLDER = "devhub";
+const FOLDER = "link-tree";
 
 const ALLOWED_IMAGE_FORMATS = ["jpg", "jpeg", "png", "webp"];
 
