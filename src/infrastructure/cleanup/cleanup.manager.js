@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import StorageMessages from "../../core/messages/storage.messages.js";
 import loggerService from "../logger/logger.service.js";
 import { MULTER_TEMP_DIR } from "../storage/multer/multer.constants.js";
 import { FILE_AGE_LIMIT_MS } from "./cleanup.constants.js";
@@ -10,10 +11,15 @@ class CleanupManager {
 
     try {
       await fs.unlink(filePath);
-      loggerService.debug?.(`Deleted file: ${filePath}`);
+      loggerService.debug?.(
+        `${StorageMessages.Responses.FILE_DELETED} Path: ${filePath}`,
+      );
       return true;
     } catch (error) {
-      loggerService.error(`Failed to delete file: ${filePath}`, error);
+      loggerService.error(
+        `${StorageMessages.Errors.FILE_DELETE_FAILED} Path: ${filePath}`,
+        error,
+      );
       return false;
     }
   }
@@ -57,7 +63,10 @@ class CleanupManager {
               deletedCount++;
             }
           } catch (error) {
-            loggerService.error(`Failed processing file: ${filePath}`, error);
+            loggerService.error(
+              `${StorageMessages.Errors.FILE_PROCESSING_FAILED} Path: ${filePath}`,
+              error,
+            );
           }
         }),
       );
@@ -65,7 +74,10 @@ class CleanupManager {
         `Temp directory cleanup completed. Deleted ${deletedCount} expired file(s).`,
       );
     } catch (error) {
-      loggerService.error("❌ Failed to clear temp directory.", error);
+      loggerService.error(
+        `${StorageMessages.Errors.STORAGE_UNAVAILABLE} - Temp directory cleanup failed.`,
+        error,
+      );
       throw error;
     }
   }

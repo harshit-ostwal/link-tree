@@ -25,7 +25,7 @@
     "start": "cross-env NODE_ENV=production bun src/index.js",
     "biome:format": "bunx biome format --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
     "biome:lint": "bunx biome lint --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
-    "biome:check": "bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
+    "biome:check": "bunx biome check . --no-errors-on-unmatched --files-ignore-unknown=true --max-diagnostics=none",
     "biome:clean": "bunx biome clean",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

@@ -10,6 +10,10 @@ const AuthMessages = {
       "Invalid OAuth provider. Please use a valid provider to sign in.",
     OAUTH_ACCOUNT_NOT_LINKED:
       "OAuth account not linked. Please sign in with your credentials first.",
+    OAUTH_EMAIL_NOT_VERIFIED_GOOGLE:
+      "Google account does not have a verified email address associated with it. Please ensure your Google account has a verified email address.",
+    OAUTH_EMAIL_NOT_VERIFIED_GITHUB:
+      "GitHub account does not have an email address associated with it. Please ensure your GitHub account has a verified email address.",
   },
 
   Responses: {

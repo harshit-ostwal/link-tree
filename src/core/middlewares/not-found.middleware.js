@@ -1,12 +1,8 @@
-import { API_VERSION } from "../../shared/constants/api.constants.js";
 import ApiError from "../http/api.error.js";
+import HttpMessages from "../messages/http.messages.js";
 
-const notFound = (req, _res, next) => {
-  return next(
-    ApiError.notFound(
-      `Route "${req.originalUrl}" was not found. See /api/${API_VERSION}/docs for available endpoints.`,
-    ),
-  );
+const notFound = (_req, _res, next) => {
+  return next(ApiError.notFound(HttpMessages.ClientErrors.NOT_FOUND));
 };
 
 export default notFound;

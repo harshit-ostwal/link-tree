@@ -30,7 +30,6 @@ router
     validate(updateProfileSchema),
     requireActiveStatus,
     profileController.upsertProfileByUserId,
-  )
-  .delete(requireActiveStatus, profileController.deleteProfileByUserId);
+  );
 
 export { router as profileRouter };

@@ -11,6 +11,7 @@ import {
   TOKEN_TYPE,
 } from "../../shared/constants/security.constants.js";
 import ApiError from "../http/api.error.js";
+import SecurityMessages from "../messages/security.messages.js";
 import { hashToken } from "./hash.security.js";
 
 const generateToken = (user, type) => {
@@ -18,7 +19,7 @@ const generateToken = (user, type) => {
 
   if (!config) {
     throw ApiError.internalServerError(
-      `Invalid token type: ${type}. Please try again later.`,
+      `Invalid token type: ${type}. ${SecurityMessages.Errors.UNAUTHORIZED}`,
     );
   }
 
@@ -44,7 +45,7 @@ const verifyToken = (token, type) => {
 
     if (!config) {
       throw ApiError.internalServerError(
-        `Invalid token type: ${type}. Please try again later.`,
+        `Invalid token type: ${type}. ${SecurityMessages.Errors.UNAUTHORIZED}`,
       );
     }
 
@@ -55,11 +56,8 @@ const verifyToken = (token, type) => {
     });
   } catch (error) {
     throw error.name === "TokenExpiredError"
-      ? ApiError.unauthorized(
-          "Token has expired. Please try again later.",
-          error,
-        )
-      : ApiError.unauthorized("Invalid token. Please try again later.", error);
+      ? ApiError.unauthorized(SecurityMessages.Errors.SESSION_EXPIRED, error)
+      : ApiError.unauthorized(SecurityMessages.Errors.UNAUTHORIZED, error);
   }
 };
 

@@ -2,6 +2,7 @@ import ApiError from "../../../core/http/api.error.js";
 import cleanupManager from "../../cleanup/cleanup.manager.js";
 import { cloudinary } from "./cloudinary.config.js";
 import { CLOUDINARY_FOLDERS, FOLDER } from "./cloudinary.constants.js";
+import CloudinaryMessages from "./cloudinary.messages.js";
 
 class CloudinaryService {
   #cloudinary;
@@ -23,7 +24,7 @@ class CloudinaryService {
       await cleanupManager.deleteLocalFile(file);
 
       throw ApiError.internalServerError(
-        "Failed to upload image to Cloudinary",
+        CloudinaryMessages.Errors.UPLOAD_FAILED,
         error,
       );
     }
@@ -35,7 +36,7 @@ class CloudinaryService {
       return res;
     } catch (error) {
       throw ApiError.internalServerError(
-        "Failed to delete image from Cloudinary",
+        CloudinaryMessages.Errors.DELETE_FAILED,
         error,
       );
     }
@@ -47,7 +48,7 @@ class CloudinaryService {
       return res;
     } catch (error) {
       throw ApiError.internalServerError(
-        "Failed to delete images from Cloudinary",
+        CloudinaryMessages.Errors.MULTIPLE_DELETE_FAILED,
         error,
       );
     }

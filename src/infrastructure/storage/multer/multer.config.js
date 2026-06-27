@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import multer from "multer";
 import ApiError from "../../../core/http/api.error.js";
+import StorageMessages from "../../../core/messages/storage.messages.js";
 import generateUUID from "../../../shared/utils/uuid.utils.js";
 import { ALLOWED_MIME_TYPES, MULTER_TEMP_DIR } from "./multer.constants.js";
 
@@ -22,7 +23,10 @@ export const multerStorage = multer.diskStorage({
 
 export const multerFileFilter = (_req, file, cb) => {
   if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-    return cb(ApiError.badRequest("Only image files are allowed!"), false);
+    return cb(
+      ApiError.badRequest(StorageMessages.Errors.INVALID_FILE_TYPE),
+      false,
+    );
   }
   cb(null, true);
 };

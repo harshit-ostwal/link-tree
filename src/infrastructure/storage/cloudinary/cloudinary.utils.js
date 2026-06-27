@@ -10,6 +10,7 @@ import {
   RESOURCE_TYPE,
   TYPE,
 } from "./cloudinary.constants.js";
+import CloudinaryMessages from "./cloudinary.messages.js";
 
 export const getUploadOptions = (options = {}) => ({
   resource_type: RESOURCE_TYPE,
@@ -22,7 +23,7 @@ export const getUploadOptions = (options = {}) => ({
 
 export const validateFile = async (file) => {
   if (!file) {
-    throw ApiError.badRequest("No file provided for upload");
+    throw ApiError.badRequest(CloudinaryMessages.Errors.NO_FILE_PROVIDED);
   }
 
   const extension = path.extname(file).replace(".", "").toLowerCase();
@@ -30,9 +31,7 @@ export const validateFile = async (file) => {
   if (!ALLOWED_IMAGE_FORMATS.includes(extension)) {
     await cleanupManager.deleteLocalFile(file);
 
-    throw ApiError.badRequest(
-      `Invalid file format: ${extension}. Allowed formats are: ${ALLOWED_IMAGE_FORMATS.join(", ")}`,
-    );
+    throw ApiError.badRequest(CloudinaryMessages.Errors.INVALID_FILE_FORMAT);
   }
 
   const stats = fs.statSync(file);
@@ -40,8 +39,6 @@ export const validateFile = async (file) => {
   if (stats.size > MAX_FILE_SIZE) {
     await cleanupManager.deleteLocalFile(file);
 
-    throw ApiError.badRequest(
-      `File size exceeds the maximum limit of ${MAX_FILE_SIZE / (1024 * 1024)} MB`,
-    );
+    throw ApiError.badRequest(CloudinaryMessages.Errors.FILE_SIZE_EXCEEDED);
   }
 };

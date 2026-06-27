@@ -1,6 +1,7 @@
 import { NODE_ENV } from "../../config/env.config.js";
 import loggerService from "../../infrastructure/logger/logger.service.js";
 import ApiError from "../http/api.error.js";
+import CommonMessages from "../messages/common.messages.js";
 
 const errorHandler = (err, req, res, _next) => {
   const error = ApiError.from(err);
@@ -30,7 +31,7 @@ const errorHandler = (err, req, res, _next) => {
     isProduction && !error.isOperational
       ? {
           success: false,
-          message: "Something went wrong",
+          message: CommonMessages.Errors.SOMETHING_WENT_WRONG,
         }
       : {
           ...error.toJSON(),

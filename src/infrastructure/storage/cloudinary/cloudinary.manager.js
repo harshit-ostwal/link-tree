@@ -1,12 +1,13 @@
 import ApiError from "../../../core/http/api.error.js";
 import { CLOUDINARY_FOLDERS } from "./cloudinary.constants.js";
+import CloudinaryMessages from "./cloudinary.messages.js";
 import CloudinaryService from "./cloudinary.service.js";
 import { getUploadOptions, validateFile } from "./cloudinary.utils.js";
 
 class CloudinaryManager {
   async uploadImage(file, folder = CLOUDINARY_FOLDERS.DEFAULT, options = {}) {
     if (!file) {
-      throw ApiError.badRequest("No file provided for upload");
+      throw ApiError.badRequest(CloudinaryMessages.Errors.NO_FILE_PROVIDED);
     }
 
     validateFile(file);
@@ -16,7 +17,7 @@ class CloudinaryManager {
 
   async uploadImages(files, folder = CLOUDINARY_FOLDERS.DEFAULT, options = {}) {
     if (!files || files.length === 0) {
-      throw ApiError.badRequest("No files provided for upload");
+      throw ApiError.badRequest(CloudinaryMessages.Errors.NO_FILES_PROVIDED);
     }
 
     const uploadOptions = getUploadOptions(options);
@@ -35,20 +36,20 @@ class CloudinaryManager {
     options = {},
   ) {
     if (!publicId) {
-      throw ApiError.badRequest("No public ID provided for update");
+      throw ApiError.badRequest(
+        CloudinaryMessages.Errors.NO_PUBLIC_ID_PROVIDED,
+      );
     }
 
     if (!file) {
-      throw ApiError.badRequest("No file provided for update");
+      throw ApiError.badRequest(CloudinaryMessages.Errors.NO_FILE_PROVIDED);
     }
 
     validateFile(file);
 
     const existingImage = await CloudinaryService.delete(publicId);
     if (!existingImage) {
-      throw ApiError.notFound(
-        `Image with public ID ${publicId} not found for update`,
-      );
+      throw ApiError.notFound(CloudinaryMessages.Errors.IMAGE_NOT_FOUND);
     }
 
     const uploadOptions = getUploadOptions(options);
@@ -62,17 +63,15 @@ class CloudinaryManager {
     options = {},
   ) {
     if (!publicIds?.length) {
-      throw ApiError.badRequest("No public IDs provided for update");
+      throw ApiError.badRequest(CloudinaryMessages.Errors.PUBLIC_IDS_REQUIRED);
     }
 
     if (!files?.length) {
-      throw ApiError.badRequest("No files provided for update");
+      throw ApiError.badRequest(CloudinaryMessages.Errors.NO_FILES_PROVIDED);
     }
 
     if (publicIds.length !== files.length) {
-      throw ApiError.badRequest(
-        "Number of public IDs must match number of files",
-      );
+      throw ApiError.badRequest(CloudinaryMessages.Errors.FILE_COUNT_MISMATCH);
     }
 
     return await Promise.all(
@@ -84,7 +83,9 @@ class CloudinaryManager {
 
   async deleteImage(publicId) {
     if (!publicId) {
-      throw ApiError.badRequest("No public ID provided for deletion");
+      throw ApiError.badRequest(
+        CloudinaryMessages.Errors.NO_PUBLIC_ID_PROVIDED,
+      );
     }
 
     return await CloudinaryService.delete(publicId);
@@ -92,7 +93,7 @@ class CloudinaryManager {
 
   async deleteImages(publicIds) {
     if (!publicIds || publicIds.length === 0) {
-      throw ApiError.badRequest("No public IDs provided for deletion");
+      throw ApiError.badRequest(CloudinaryMessages.Errors.PUBLIC_IDS_REQUIRED);
     }
 
     return await CloudinaryService.deleteMany(publicIds);

@@ -3,6 +3,7 @@ import { Strategy as GoogleProvider } from "passport-google-oauth20";
 import ApiError from "../../../core/http/api.error.js";
 import { AuthProvider } from "../../../infrastructure/database/generated/prisma/index.js";
 import { getRequestInfo } from "../../../shared/utils/request.utils.js";
+import AuthMessages from "../auth.messages.js";
 import { AuthService } from "../auth.service.js";
 import { oAuthConfig } from "../config/oauth.config.js";
 
@@ -19,7 +20,7 @@ const GoogleStrategy = () => {
           if (!email) {
             return done(
               ApiError.unauthorized(
-                "Google account does not have a verified email address associated with it. Please ensure your Google account has a verified email address.",
+                AuthMessages.Errors.OAUTH_EMAIL_NOT_VERIFIED_GOOGLE,
               ),
             );
           }

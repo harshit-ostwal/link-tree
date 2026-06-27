@@ -1,6 +1,7 @@
 import { ZodError } from "zod/v4";
 import ValidationSource from "../../shared/constants/validation.constants.js";
 import ApiError from "../http/api.error.js";
+import ValidationMessages from "../messages/validation.messages.js";
 
 const validate =
   (schema, source = ValidationSource.BODY) =>
@@ -11,7 +12,10 @@ const validate =
       if (!result.success) {
         const flattenError = result.error.flatten();
         return next(
-          ApiError.validationError("Validation Error", [flattenError]),
+          ApiError.validationError(
+            ValidationMessages.Errors.INVALID_REQUEST_BODY,
+            [flattenError],
+          ),
         );
       }
 
@@ -20,7 +24,10 @@ const validate =
       if (error instanceof ZodError) {
         const flattenError = error.flatten();
         return next(
-          ApiError.validationError("Validation Error", [flattenError]),
+          ApiError.validationError(
+            ValidationMessages.Errors.INVALID_REQUEST_BODY,
+            [flattenError],
+          ),
         );
       }
 

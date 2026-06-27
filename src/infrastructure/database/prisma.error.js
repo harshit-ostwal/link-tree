@@ -1,4 +1,5 @@
 import ApiError from "../../core/http/api.error.js";
+import DatabaseMessages from "../../core/messages/database.messages.js";
 import { Prisma } from "./generated/prisma/index.js";
 
 const mapPrismaError = (error) => {
@@ -9,18 +10,22 @@ const mapPrismaError = (error) => {
   switch (error.code) {
     // Database connection errors
     case "P1001":
-      return ApiError.serviceUnavailable("Unable to connect to the database.");
+      return ApiError.serviceUnavailable(
+        DatabaseMessages.Errors.CONNECTION_FAILED,
+      );
 
     case "P1008":
-      return ApiError.gatewayTimeout("Database operation timed out.");
+      return ApiError.gatewayTimeout(DatabaseMessages.Errors.OPERATION_TIMEOUT);
 
     case "P1017":
-      return ApiError.serviceUnavailable("Database connection was closed.");
+      return ApiError.serviceUnavailable(
+        DatabaseMessages.Errors.CONNECTION_CLOSED,
+      );
 
     // Value too long
     case "P2000":
       return ApiError.validationError(
-        "Input value exceeds the allowed length.",
+        DatabaseMessages.Errors.INVALID_FIELD_VALUE,
       );
 
     // Unique constraint
@@ -30,15 +35,20 @@ const mapPrismaError = (error) => {
           field,
           message: `${
             field.charAt(0).toUpperCase() + field.slice(1)
-          } already exists.`,
+          } ${DatabaseMessages.Errors.UNIQUE_CONSTRAINT_VIOLATION}`,
         })) ?? [];
 
-      return ApiError.conflict("Validation failed.", errors);
+      return ApiError.conflict(
+        DatabaseMessages.Errors.UNIQUE_CONSTRAINT_VIOLATION,
+        errors,
+      );
     }
 
     // Foreign key constraint
     case "P2003":
-      return ApiError.badRequest("Invalid relation reference.");
+      return ApiError.badRequest(
+        DatabaseMessages.Errors.FOREIGN_KEY_CONSTRAINT_VIOLATION,
+      );
 
     // Invalid column value
     case "P2007": {
@@ -50,23 +60,27 @@ const mapPrismaError = (error) => {
         if (enumMatch) {
           const [, field, value] = enumMatch;
 
-          return ApiError.badRequest(`Invalid value '${value}' for ${field}.`);
+          return ApiError.badRequest(
+            `${DatabaseMessages.Errors.INVALID_ENUM_VALUE}: '${value}' for ${field}.`,
+          );
         }
       }
 
-      return ApiError.badRequest("One or more values are invalid.");
+      return ApiError.badRequest(DatabaseMessages.Errors.INVALID_FIELD_VALUE);
     }
 
     // Null constraint violation
     case "P2011":
-      return ApiError.validationError("A required field is missing.");
+      return ApiError.validationError(DatabaseMessages.Errors.FIELD_REQUIRED);
 
     // Record not found
     case "P2025":
-      return ApiError.notFound("Requested resource not found.");
+      return ApiError.notFound(DatabaseMessages.Errors.RECORD_NOT_FOUND);
 
     default:
-      return ApiError.internalServerError("Database operation failed.");
+      return ApiError.internalServerError(
+        DatabaseMessages.Errors.OPERATION_FAILED,
+      );
   }
 };
 

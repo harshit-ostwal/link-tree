@@ -37,17 +37,6 @@ class ProfileController {
       ProfileMessages.Responses.UPDATED,
     ).send(res);
   });
-
-  deleteProfileByUserId = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
-
-    const profile = await this.#profileService.deleteProfileByUserId(userId);
-
-    return ApiResponse.ok(
-      new ProfileDto(profile),
-      ProfileMessages.Responses.DELETED,
-    ).send(res);
-  });
 }
 
 export default new ProfileController();

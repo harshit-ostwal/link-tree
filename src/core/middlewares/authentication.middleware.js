@@ -29,16 +29,11 @@ export const verifyAuthenticationJWT = asyncHandler(async (req, res, next) => {
 
   const { id: userId, sessionId, tokenVersion } = decodedToken;
 
-  console.log(JSON.stringify({ userId, sessionId, tokenVersion }, null, 2));
-
   await PrismaService.transaction(async (prismaClient) => {
     const { userService, sessionService } = createServices(prismaClient);
 
     const user = await userService.findUserById(userId);
     const session = await sessionService.findSessionById(sessionId);
-
-    console.log(user);
-    console.log(session);
 
     if (!(user && session)) {
       clearAuthCookies(res);
