@@ -19,6 +19,8 @@ const validate =
         );
       }
 
+      req[source] = result.data;
+
       return next();
     } catch (error) {
       if (error instanceof ZodError) {

@@ -1,10 +1,7 @@
 import ApiError from "../../core/http/api.error.js";
 import { hashValue } from "../../core/security/hash.security.js";
 import { AuthProvider } from "../../infrastructure/database/generated/prisma/index.js";
-import {
-  getChangedFields,
-  hasChanges,
-} from "../../shared/utils/object.utils.js";
+import { getChangedFields } from "../../shared/utils/object.utils.js";
 import AccountMessages from "./account.messages.js";
 import { AccountRepository } from "./account.repository.js";
 
@@ -87,8 +84,8 @@ class AccountService {
 
     const changedFields = getChangedFields(existingAccount, data);
 
-    if (!hasChanges(existingAccount, data)) {
-      return existingAccount;
+    if (Object.keys(changedFields).length === 0) {
+      return existingSession;
     }
 
     if (data.password && data.provider === AuthProvider.CREDENTIALS) {

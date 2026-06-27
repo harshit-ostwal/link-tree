@@ -1,9 +1,6 @@
 import createRouter from "../../core/factories/router.factory.js";
 import { verifyAuthenticationJWT } from "../../core/middlewares/authentication.middleware.js";
-import {
-  requireAdmin,
-  requireSelfOrAdmin,
-} from "../../core/middlewares/role.authorization.js";
+import { requireAdmin } from "../../core/middlewares/role.authorization.js";
 import {
   requireActiveOrAdmin,
   requireActiveStatus,
@@ -30,6 +27,17 @@ router.get(
 
 router.use(verifyAuthenticationJWT);
 
+router
+  .route("/")
+  .post(requireAdmin, validate(createUserSchema), userController.createUser)
+  .get(requireActiveOrAdmin, userController.getUserById)
+  .patch(
+    validate(updateUserSchema),
+    requireActiveStatus,
+    userController.updateUserById,
+  )
+  .delete(requireActiveStatus, userController.softDeleteUserById);
+
 router.get(
   "/email/:email",
   requireAdmin,
@@ -43,35 +51,6 @@ router.get(
   validate(identifierParamSchema, ValidationSource.PARAMS),
   userController.getUserByIdentifier,
 );
-
-router.post(
-  "/",
-  requireAdmin,
-  validate(createUserSchema),
-  userController.createUser,
-);
-
-router
-  .route("/:id")
-  .get(
-    validate(idParamSchema, ValidationSource.PARAMS),
-    requireActiveOrAdmin,
-    requireSelfOrAdmin,
-    userController.getUserById,
-  )
-  .patch(
-    validate(idParamSchema, ValidationSource.PARAMS),
-    validate(updateUserSchema),
-    requireActiveStatus,
-    requireSelfOrAdmin,
-    userController.updateUserById,
-  )
-  .delete(
-    validate(idParamSchema, ValidationSource.PARAMS),
-    requireActiveStatus,
-    requireSelfOrAdmin,
-    userController.softDeleteUserById,
-  );
 
 router.delete(
   "/:id/hard",

@@ -19,9 +19,9 @@ class AuthController {
   signInWithOAuth = asyncHandler(async (req, res) => {
     const user = req.user;
 
-    setAuthCookies(res, user.accessToken, user.refreshToken);
+    setAuthCookies(res, user.refreshToken);
 
-    return ApiResponse.redirect(res, FRONTEND_URL);
+    return ApiResponse.redirect(res, FRONTEND_URL).send(res);
   });
 
   signUpWithCredentials = asyncHandler(async (req, res) => {
@@ -47,10 +47,10 @@ class AuthController {
     const { user, accessToken, refreshToken } =
       await this.#authService.signInWithCredentials(data);
 
-    setAuthCookies(res, accessToken, refreshToken);
+    setAuthCookies(res, refreshToken);
 
     return ApiResponse.ok(
-      new AuthDto(user),
+      new AuthDto(user, accessToken),
       AuthMessages.Responses.SIGN_IN_SUCCESS,
     ).send(res);
   });
@@ -79,6 +79,31 @@ class AuthController {
     return ApiResponse.noContent(
       null,
       AuthMessages.Responses.SIGN_OUT_ALL_SESSIONS_SUCCESS,
+    ).send(res);
+  });
+
+  refreshSession = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    const { accessToken, refreshToken: newRefreshToken } =
+      await this.#authService.refreshSession(refreshToken);
+
+    setAuthCookies(res, newRefreshToken);
+
+    return ApiResponse.ok(
+      new AuthDto(user, accessToken),
+      AuthMessages.Responses.SIGN_IN_SUCCESS,
+    ).send(res);
+  });
+
+  getMe = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+
+    const user = await this.#authService.getMe(userId);
+
+    return ApiResponse.ok(
+      new AuthDto(user),
+      AuthMessages.Responses.FETCHED_USER_SUCCESS,
     ).send(res);
   });
 }

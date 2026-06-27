@@ -20,7 +20,7 @@ class UserController {
   });
 
   getUserById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
+    const id = req.user.id;
 
     const user = await this.#userService.getUserById(id);
 
@@ -75,7 +75,7 @@ class UserController {
   });
 
   updateUserById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
+    const id = req.user.id;
     const data = req.body;
 
     const user = await this.#userService.updateUserById(id, data);
@@ -87,7 +87,7 @@ class UserController {
   });
 
   softDeleteUserById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
+    const id = req.user.id;
 
     const user = await this.#userService.softDeleteUserById(id);
 

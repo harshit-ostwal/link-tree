@@ -1,12 +1,15 @@
 class AuthDto {
-  constructor(user) {
-    this.email = user.email;
-    this.emailVerifiedAt = user.emailVerifiedAt;
+  constructor(user, accessToken) {
+    user = {
+      email: user.email,
+      emailVerifiedAt: user.emailVerifiedAt,
 
-    this.username = user.username;
+      username: user.username,
 
-    this.role = user.role;
-    this.status = user.status;
+      role: user.role,
+      status: user.status,
+    };
+    this.accessToken = accessToken;
   }
 }
 

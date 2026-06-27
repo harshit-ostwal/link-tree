@@ -1,8 +1,5 @@
 import ApiError from "../../core/http/api.error.js";
-import {
-  getChangedFields,
-  hasChanges,
-} from "../../shared/utils/object.utils.js";
+import { getChangedFields } from "../../shared/utils/object.utils.js";
 import { generateUsername } from "../../shared/utils/username.utils.js";
 import UserMessages from "./user.messages.js";
 import { UserRepository } from "./user.repository.js";
@@ -107,8 +104,8 @@ class UserService {
 
     const changedFields = getChangedFields(existingUser, data);
 
-    if (!hasChanges(existingUser, data)) {
-      return existingUser;
+    if (Object.keys(changedFields).length === 0) {
+      return existingSession;
     }
 
     const user = await this.#userRepo.update(id, changedFields);

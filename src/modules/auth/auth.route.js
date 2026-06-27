@@ -7,6 +7,8 @@ import { authGuard } from "./guards/auth.guard.js";
 
 const router = createRouter();
 
+router.get("/me", authController.getMe);
+
 router.get(
   "/google",
   authGuard("google", {
@@ -45,5 +47,7 @@ router.use(verifyAuthenticationJWT);
 router.delete("/sign-out", authController.signOut);
 
 router.delete("/sign-out/all", authController.signOutAllSessions);
+
+router.post("/refresh-session", authController.refreshSession);
 
 export { router as authRouter };

@@ -25,6 +25,14 @@ class SessionRepository {
     });
   }
 
+  async countActiveSessionsByUserId(userId) {
+    return await this.#prisma.session.count({
+      where: {
+        userId,
+      },
+    });
+  }
+
   async create(userId, data) {
     return await this.#prisma.session.create({
       data: {
@@ -63,7 +71,6 @@ class SessionRepository {
       where: {
         userId,
       },
-      limit: 5,
     });
   }
 }

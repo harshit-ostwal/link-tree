@@ -14,6 +14,11 @@ const AuthMessages = {
       "Google account does not have a verified email address associated with it. Please ensure your Google account has a verified email address.",
     OAUTH_EMAIL_NOT_VERIFIED_GITHUB:
       "GitHub account does not have an email address associated with it. Please ensure your GitHub account has a verified email address.",
+
+    INVALID_REFRESH_TOKEN:
+      "Invalid refresh token. Please sign in again to continue.",
+    MISSING_REFRESH_TOKEN:
+      "Missing refresh token. Please sign in again to continue.",
   },
 
   Responses: {
@@ -24,9 +29,9 @@ const AuthMessages = {
       "User signed out successfully. Please sign in again to continue.",
     SIGN_OUT_ALL_SESSIONS_SUCCESS:
       "User signed out from all sessions successfully. Please sign in again to continue.",
-
     SIGN_IN_WITH_OAUTH_SUCCESS:
       "User signed in with OAuth successfully. Please complete your profile to continue.",
+    FETCHED_USER_SUCCESS: "User information retrieved successfully.",
   },
 };
 

@@ -1,10 +1,7 @@
 import ApiError from "../../core/http/api.error.js";
 import { generateAuthTokens } from "../../core/security/jwt.security.js";
 import { MAX_DEVICE_LIMIT } from "../../shared/constants/api.constants.js";
-import {
-  getChangedFields,
-  hasChanges,
-} from "../../shared/utils/object.utils.js";
+import { getChangedFields } from "../../shared/utils/object.utils.js";
 import generateUUID from "../../shared/utils/uuid.utils.js";
 import SessionMessages from "./session.messages.js";
 import { SessionRepository } from "./session.repository.js";
@@ -42,7 +39,12 @@ class SessionService {
   async createSessionByUserId(userId, data) {
     const existingSessions = await this.#sessionRepo.findByUserId(userId);
 
-    if (existingSessions.length >= MAX_DEVICE_LIMIT) {
+    const now = new Date();
+    const activeSessions = existingSessions.filter(
+      ({ refreshTokenExpiryAt }) => refreshTokenExpiryAt > now,
+    );
+
+    if (activeSessions.length >= MAX_DEVICE_LIMIT) {
       throw ApiError.forbidden(SessionMessages.Errors.MAX_DEVICE_LIMIT_REACHED);
     }
 
@@ -78,36 +80,31 @@ class SessionService {
     };
   }
 
-  async updateSessionById(id, data) {
-    const existingSession = await this.getSessionById(id);
+  async rotateSessionById(id) {
+    const session = await this.getSessionById(id);
 
-    const changedFields = getChangedFields(existingSession, data);
-
-    if (!hasChanges(existingSession, data)) {
-      return existingSession;
+    if (session.refreshTokenExpiryAt < new Date()) {
+      throw ApiError.unauthorized(SessionMessages.Errors.INVALID_REFRESH_TOKEN);
     }
 
     const {
       accessToken,
       refreshToken,
-      refreshTokenExpiryAt,
       hashedRefreshToken,
+      refreshTokenExpiryAt,
     } = generateAuthTokens({
-      id: existingSession.userId,
-      sessionId: existingSession.id,
-      tokenVersion: existingSession.tokenVersion + 1,
+      id: session.userId,
+      sessionId: session.id,
+      tokenVersion: session.tokenVersion + 1,
     });
 
-    const payload = {
-      ...changedFields,
-      tokenVersion: existingSession.tokenVersion + 1,
+    const updatedSession = await this.#sessionRepo.update(id, {
+      tokenVersion: session.tokenVersion + 1,
       refreshToken: hashedRefreshToken,
       refreshTokenExpiryAt,
-    };
+    });
 
-    const session = await this.#sessionRepo.update(id, payload);
-
-    if (!session) {
+    if (!updatedSession) {
       throw ApiError.internalServerError(SessionMessages.Errors.UPDATE_FAILED);
     }
 
@@ -115,6 +112,24 @@ class SessionService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async updateSessionById(id, data) {
+    const existingSession = await this.getSessionById(id);
+
+    const changedFields = getChangedFields(existingSession, data);
+
+    if (Object.keys(changedFields).length === 0) {
+      return existingSession;
+    }
+
+    const session = await this.#sessionRepo.update(id, changedFields);
+
+    if (!session) {
+      throw ApiError.internalServerError(SessionMessages.Errors.UPDATE_FAILED);
+    }
+
+    return session;
   }
 
   async deleteSessionById(userId, id) {
@@ -134,19 +149,15 @@ class SessionService {
   }
 
   async deleteSessionsByUserId(userId) {
-    const sessions = await this.getSessionsByUserId(userId);
+    await this.getSessionsByUserId(userId);
 
-    if (!sessions || sessions.length === 0) {
-      throw ApiError.notFound(SessionMessages.Errors.NOT_FOUND);
-    }
+    const sessions = await this.#sessionRepo.deleteByUserId(userId);
 
-    const deletedSessions = await this.#sessionRepo.deleteByUserId(userId);
-
-    if (!deletedSessions) {
+    if (!sessions) {
       throw ApiError.internalServerError(SessionMessages.Errors.DELETE_FAILED);
     }
 
-    return deletedSessions;
+    return sessions;
   }
 }
 

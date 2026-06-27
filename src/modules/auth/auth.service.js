@@ -1,15 +1,20 @@
 import { createServices } from "../../core/factories/service.factory.js";
 import ApiError from "../../core/http/api.error.js";
-import { compareHash } from "../../core/security/hash.security.js";
+import { compareHash, hashToken } from "../../core/security/hash.security.js";
+import { verifyToken } from "../../core/security/jwt.security.js";
 import { AuthProvider } from "../../infrastructure/database/generated/prisma/index.js";
 import prismaService from "../../infrastructure/database/prisma.service.js";
+import { TOKEN_TYPE } from "../../shared/constants/security.constants.js";
 import { SessionService } from "../sessions/session.service.js";
+import { UserService } from "../users/user.service.js";
 import AuthMessages from "./auth.messages.js";
 
 class AuthService {
   #sessionService;
+  #userService;
   constructor(prismaClient) {
     this.#sessionService = new SessionService(prismaClient);
+    this.#userService = new UserService(prismaClient);
   }
 
   async signInWithOAuth(data) {
@@ -215,6 +220,52 @@ class AuthService {
 
   async signOutAllSessions(userId) {
     return await this.#sessionService.deleteSessionsByUserId(userId);
+  }
+
+  async refreshSession(refreshToken) {
+    if (!refreshToken) {
+      throw ApiError.unauthorized(AuthMessages.Errors.MISSING_REFRESH_TOKEN);
+    }
+
+    let decodedToken;
+
+    try {
+      decodedToken = verifyToken(refreshToken, TOKEN_TYPE.REFRESH);
+    } catch {
+      throw ApiError.unauthorized(AuthMessages.Errors.INVALID_REFRESH_TOKEN);
+    }
+
+    return await prismaService.transaction(async (prismaClient) => {
+      const { sessionService } = createServices(prismaClient);
+
+      const existingSession = await sessionService.findSessionById(
+        decodedToken.sessionId,
+      );
+
+      if (!existingSession || existingSession.userId !== decodedToken.userId) {
+        throw ApiError.unauthorized(AuthMessages.Errors.INVALID_REFRESH_TOKEN);
+      }
+
+      if (hashToken(refreshToken) !== existingSession.refreshToken) {
+        throw ApiError.unauthorized(AuthMessages.Errors.INVALID_REFRESH_TOKEN);
+      }
+
+      if (existingSession.tokenVersion !== decodedToken.tokenVersion) {
+        throw ApiError.unauthorized(AuthMessages.Errors.INVALID_REFRESH_TOKEN);
+      }
+
+      const { accessToken, refreshToken: newRefreshToken } =
+        await sessionService.rotateSessionById(existingSession.id);
+
+      return {
+        accessToken,
+        refreshToken: newRefreshToken,
+      };
+    });
+  }
+
+  async getMe(userId) {
+    return await this.#userService.getUserById(userId);
   }
 }
 
