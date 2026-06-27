@@ -1,6 +1,5 @@
 import ApiResponse from "../../core/http/api.response.js";
 import asyncHandler from "../../core/middlewares/async-handler.middleware.js";
-import { getRequestInfo } from "../../shared/utils/request.utils.js";
 import { SessionDto } from "./session.dto.js";
 import SessionMessages from "./session.messages.js";
 import { SessionService } from "./session.service.js";
@@ -30,42 +29,6 @@ class SessionController {
     return ApiResponse.ok(
       sessions.map((session) => new SessionDto(session)),
       SessionMessages.Responses.FETCHED_ALL,
-    ).send(res);
-  });
-
-  createSessionByUserId = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
-    const data = req.body;
-
-    const { ipAddress, userAgent } = getRequestInfo(req);
-
-    data.ipAddress = ipAddress;
-    data.userAgent = userAgent;
-
-    const session = await this.#sessionService.createSessionByUserId(
-      userId,
-      data,
-    );
-
-    return ApiResponse.created(
-      new SessionDto(session),
-      SessionMessages.Responses.CREATED,
-    ).send(res);
-  });
-
-  updateSessionById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const data = req.body;
-
-    const { ipAddress, userAgent } = getRequestInfo(req);
-    data.ipAddress = ipAddress;
-    data.userAgent = userAgent;
-
-    const session = await this.#sessionService.updateSessionById(id, data);
-
-    return ApiResponse.ok(
-      new SessionDto(session),
-      SessionMessages.Responses.UPDATED,
     ).send(res);
   });
 

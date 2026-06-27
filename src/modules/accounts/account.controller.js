@@ -10,37 +10,10 @@ class AccountController {
     this.#accountService = new AccountService();
   }
 
-  getAccountById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
-
-    const account = await this.#accountService.getAccountById(id);
-
-    return ApiResponse.ok(
-      new AccountDto(account),
-      AccountMessages.Responses.FETCHED,
-    ).send(res);
-  });
-
   getAccountsByUserId = asyncHandler(async (req, res) => {
     const userId = req.user.id;
 
     const account = await this.#accountService.getAccountsByUserId(userId);
-
-    return ApiResponse.ok(
-      new AccountDto(account),
-      AccountMessages.Responses.FETCHED,
-    ).send(res);
-  });
-
-  getAccountByProviderAndProviderId = asyncHandler(async (req, res) => {
-    const provider = req.params.provider;
-    const providerId = req.params.providerId;
-
-    const account =
-      await this.#accountService.getAccountByProviderAndProviderId(
-        provider,
-        providerId,
-      );
 
     return ApiResponse.ok(
       new AccountDto(account),
@@ -78,36 +51,17 @@ class AccountController {
     ).send(res);
   });
 
-  updateAccountById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const data = req.body;
-
-    const account = await this.#accountService.updateAccountById(id, data);
-
-    return ApiResponse.ok(
-      new AccountDto(account),
-      AccountMessages.Responses.UPDATED,
-    ).send(res);
-  });
-
-  deleteAccountById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
-
-    const account = await this.#accountService.deleteAccountById(id);
-
-    return ApiResponse.ok(
-      new AccountDto(account),
-      AccountMessages.Responses.DELETED,
-    ).send(res);
-  });
-
-  deleteAccountsByUserId = asyncHandler(async (req, res) => {
+  deleteAccountByUserIdAndProvider = asyncHandler(async (req, res) => {
     const userId = req.user.id;
+    const provider = req.params.provider;
 
-    const accounts = await this.#accountService.deleteAccountsByUserId(userId);
+    const account = await this.#accountService.deleteAccountByUserIdAndProvider(
+      userId,
+      provider,
+    );
 
     return ApiResponse.ok(
-      accounts.map((account) => new AccountDto(account)),
+      new AccountDto(account),
       AccountMessages.Responses.DELETED,
     ).send(res);
   });

@@ -76,20 +76,13 @@ class AccountRepository {
     });
   }
 
-  async delete(id) {
-    return await this.#prisma.account.delete({
-      where: {
-        id,
-      },
-      select: AccountSelect,
-    });
-  }
-
-  async deleteByUserId(userId) {
+  async deleteByUserIdAndProvider(userId, provider) {
     return await this.#prisma.account.deleteMany({
       where: {
         userId,
+        provider,
       },
+      limit: 1,
     });
   }
 }

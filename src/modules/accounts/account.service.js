@@ -1,5 +1,6 @@
 import ApiError from "../../core/http/api.error.js";
 import { hashValue } from "../../core/security/hash.security.js";
+import { AuthProvider } from "../../infrastructure/database/generated/prisma/index.js";
 import {
   getChangedFields,
   hasChanges,
@@ -33,19 +34,6 @@ class AccountService {
     return accounts;
   }
 
-  async getAccountByProviderAndProviderId(provider, providerId) {
-    const account = await this.#accountRepo.findByProviderAndProviderId(
-      provider,
-      providerId,
-    );
-
-    if (!account) {
-      throw ApiError.notFound(AccountMessages.Errors.NOT_FOUND);
-    }
-
-    return account;
-  }
-
   async findAccountByProviderAndProviderId(provider, providerId) {
     return await this.#accountRepo.findByProviderAndProviderId(
       provider,
@@ -71,7 +59,7 @@ class AccountService {
   }
 
   async createAccountByUserId(userId, data) {
-    const existingAccount = await this.#accountRepo.findByUserIdAndProvider(
+    const existingAccount = await this.findAccountByUserIdAndProvider(
       userId,
       data.provider,
     );
@@ -80,7 +68,7 @@ class AccountService {
       throw ApiError.conflict(AccountMessages.Errors.ALREADY_EXISTS);
     }
 
-    if (data.password) {
+    if (data.password && data.provider === AuthProvider.CREDENTIALS) {
       const hashedPassword = await hashValue(data.password);
       data.password = hashedPassword;
     }
@@ -103,7 +91,7 @@ class AccountService {
       return existingAccount;
     }
 
-    if (data.password) {
+    if (data.password && data.provider === AuthProvider.CREDENTIALS) {
       const hashedPassword = await hashValue(data.password);
       changedFields.password = hashedPassword;
     }
@@ -117,28 +105,26 @@ class AccountService {
     return account;
   }
 
-  async deleteAccountById(id) {
-    await this.getAccountById(id);
+  async deleteAccountByUserIdAndProvider(userId, provider) {
+    const existingAccount = await this.getAccountByUserIdAndProvider(
+      userId,
+      provider,
+    );
 
-    const account = await this.#accountRepo.delete(id);
+    if (!existingAccount) {
+      throw ApiError.notFound(AccountMessages.Errors.NOT_FOUND);
+    }
+
+    const account = await this.#accountRepo.deleteByUserIdAndProvider(
+      userId,
+      provider,
+    );
 
     if (!account) {
       throw ApiError.internalServerError(AccountMessages.Errors.DELETE_FAILED);
     }
 
     return account;
-  }
-
-  async deleteAccountsByUserId(userId) {
-    await this.getAccountsByUserId(userId);
-
-    const accounts = await this.#accountRepo.deleteByUserId(userId);
-
-    if (!accounts) {
-      throw ApiError.internalServerError(AccountMessages.Errors.DELETE_FAILED);
-    }
-
-    return accounts;
   }
 }
 

@@ -1,8 +1,16 @@
 import createRouter from "../../core/factories/router.factory.js";
+import { verifyAuthenticationJWT } from "../../core/middlewares/authentication.middleware.js";
+import {
+  requireAdmin,
+  requireSelfOrAdmin,
+} from "../../core/middlewares/role.authorization.js";
+import {
+  requireActiveOrAdmin,
+  requireActiveStatus,
+} from "../../core/middlewares/status.authorization.js";
 import validate from "../../core/middlewares/validate.middleware.js";
 import ValidationSource from "../../shared/constants/validation.constants.js";
 import { idParamSchema } from "../../shared/schemas/uuid.schema.js";
-import { requireSelfOrAdmin } from "./user.authoriztion.js";
 import userController from "./user.controller.js";
 import {
   createUserSchema,
@@ -14,43 +22,61 @@ import {
 
 const router = createRouter();
 
-router
-  .route("/")
-  .get(userController.getAllUsers)
-  .post(validate(createUserSchema), userController.createUser);
-
-router.get(
-  "/email/:email",
-  validate(emailParamSchema, ValidationSource.PARAMS),
-  userController.getUserByEmail,
-);
 router.get(
   "/username/:username",
   validate(usernameParamSchema, ValidationSource.PARAMS),
   userController.getUserByUsername,
 );
 
+router.use(verifyAuthenticationJWT);
+
+router.get(
+  "/email/:email",
+  requireAdmin,
+  validate(emailParamSchema, ValidationSource.PARAMS),
+  userController.getUserByEmail,
+);
+
 router.get(
   "/identifier/:identifier",
+  requireAdmin,
   validate(identifierParamSchema, ValidationSource.PARAMS),
   userController.getUserByIdentifier,
 );
 
+router.post(
+  "/",
+  requireAdmin,
+  validate(createUserSchema),
+  userController.createUser,
+);
+
 router
   .route("/:id")
-  .all(validate(idParamSchema, ValidationSource.PARAMS))
-  .get(userController.getUserById)
-  .patch(
+  .get(
+    validate(idParamSchema, ValidationSource.PARAMS),
+    requireActiveOrAdmin,
     requireSelfOrAdmin,
+    userController.getUserById,
+  )
+  .patch(
+    validate(idParamSchema, ValidationSource.PARAMS),
     validate(updateUserSchema),
+    requireActiveStatus,
+    requireSelfOrAdmin,
     userController.updateUserById,
   )
-  .delete(requireSelfOrAdmin, userController.softDeleteUserById);
+  .delete(
+    validate(idParamSchema, ValidationSource.PARAMS),
+    requireActiveStatus,
+    requireSelfOrAdmin,
+    userController.softDeleteUserById,
+  );
 
 router.delete(
   "/:id/hard",
   validate(idParamSchema, ValidationSource.PARAMS),
-  requireSelfOrAdmin,
+  requireAdmin,
   userController.hardDeleteUserById,
 );
 
