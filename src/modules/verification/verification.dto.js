@@ -15,3 +15,5 @@ class VerificationDto {
     this.updatedAt = verification.updatedAt;
   }
 }
+
+export { VerificationDto };
