@@ -22,7 +22,7 @@ class LinkController {
   });
 
   getLinksByUserId = asyncHandler(async (req, res) => {
-    const userId = req.params.userId;
+    const userId = req.user.id;
 
     const links = await this.#linkService.getLinksByUserId(userId);
 
