@@ -6,7 +6,7 @@ import {
   setAuthCookies,
 } from "../../shared/utils/cookie.utils.js";
 import { getRequestInfo } from "../../shared/utils/request.utils.js";
-import { AuthDto } from "./auth.dto.js";
+import { AuthDto, AuthRefreshSessionDto } from "./auth.dto.js";
 import AuthMessages from "./auth.messages.js";
 import { AuthService } from "./auth.service.js";
 
@@ -91,8 +91,8 @@ class AuthController {
     setAuthCookies(res, newRefreshToken);
 
     return ApiResponse.ok(
-      new AuthDto(user, accessToken),
-      AuthMessages.Responses.SIGN_IN_SUCCESS,
+      new AuthRefreshSessionDto(accessToken),
+      AuthMessages.Responses.REFRESH_SESSION_SUCCESS,
     ).send(res);
   });
 

@@ -242,7 +242,7 @@ class AuthService {
         decodedToken.sessionId,
       );
 
-      if (!existingSession || existingSession.userId !== decodedToken.userId) {
+      if (!existingSession || existingSession.userId !== decodedToken.id) {
         throw ApiError.unauthorized(AuthMessages.Errors.INVALID_REFRESH_TOKEN);
       }
 

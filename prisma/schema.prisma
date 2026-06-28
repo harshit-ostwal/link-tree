@@ -170,11 +170,15 @@ model Link {
 
   thumbnail         String?
   thumbnailPublicId String?
+  
   logo              String?
   logoPublicId      String?
 
-  isActive Boolean @default(true)
-  position Int     @default(0)
+  isActive   Boolean @default(true)
+  isVisible  Boolean @default(true)
+  isFeatured Boolean @default(false)
+
+  position Int @default(0)
 
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

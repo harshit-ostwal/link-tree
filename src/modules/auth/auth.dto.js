@@ -13,4 +13,10 @@ class AuthDto {
   }
 }
 
-export { AuthDto };
+class AuthRefreshSessionDto {
+  constructor(accessToken) {
+    this.accessToken = accessToken;
+  }
+}
+
+export { AuthDto, AuthRefreshSessionDto };

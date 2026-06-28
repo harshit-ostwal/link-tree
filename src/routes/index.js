@@ -49,4 +49,9 @@ router.use(
 
 router.use("/auth", (await import("../modules/auth/auth.route.js")).authRouter);
 
+router.use(
+  "/links",
+  (await import("../modules/links/link.route.js")).linkRouter,
+);
+
 export default router;

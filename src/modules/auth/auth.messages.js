@@ -32,6 +32,7 @@ const AuthMessages = {
     SIGN_IN_WITH_OAUTH_SUCCESS:
       "User signed in with OAuth successfully. Please complete your profile to continue.",
     FETCHED_USER_SUCCESS: "User information retrieved successfully.",
+    REFRESH_SESSION_SUCCESS: "Session refreshed successfully.",
   },
 };
 

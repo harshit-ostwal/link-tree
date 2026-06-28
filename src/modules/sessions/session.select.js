@@ -4,6 +4,7 @@ const SessionSelect = {
 
   refreshToken: true,
   refreshTokenExpiryAt: true,
+
   tokenVersion: true,
 
   ipAddress: true,
