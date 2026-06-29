@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import process from "node:process";
 import { config } from "dotenv";
+import z from "zod/v4";
 import envSchema from "../shared/schemas/env.schema.js";
 
 const envFile = `.env.${process.env.NODE_ENV || "development"}`;
@@ -40,7 +41,7 @@ const env = parsedEnv.success ? parsedEnv.data : {};
 if (!parsedEnv.success) {
   console.error(
     "❌ Invalid environment variables:",
-    parsedEnv.error.flatten().fieldErrors,
+    z.flattenError(parsedEnv.error).fieldErrors,
   );
 }
 
